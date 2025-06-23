@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+dotenv.config();
 
 /**
  * Establishes connection to MongoDB database
@@ -28,4 +29,4 @@ const DBConnection = async () => {
     }
 };
 // Export the connection function for use in other modules
-module.exports = { DBConnection };
+export { DBConnection };

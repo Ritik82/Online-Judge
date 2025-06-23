@@ -1,10 +1,11 @@
-const express = require('express');
+import express from 'express';
 const app = express();
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const AuthRouter = require('./Routes/AuthRouter.js'); // Ensure this file exists and contains your routes
-require('dotenv').config();
-const {DBConnection}=require('./Models/db.js'); // Ensure this file exists and connects to your database
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import AuthRouter from './Routes/AuthRouter.js'; // Ensure this file exists and contains your routes
+import dotenv from 'dotenv';
+dotenv.config();
+import { DBConnection } from './Models/db.js'; // Ensure this file exists and connects to your database
 
 const PORT = process.env.PORT || 8080;
 

@@ -1,7 +1,7 @@
-const UserModel = require("../Models/User");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const cookieParser = require("cookie-parser");
+import UserModel from "../Models/User.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
 const signup= async (req, res) => {
     try{
         const { name, email, password } = req.body;
@@ -118,7 +118,4 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = {
-    signup,
-    login,
-};
+export  { signup, login };

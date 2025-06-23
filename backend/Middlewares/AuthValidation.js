@@ -1,4 +1,4 @@
-const joi= require('joi');
+import joi from 'joi';
 
 const signupValidation = (req, res, next) => {
     const schema = joi.object({
@@ -27,7 +27,4 @@ const loginValidation = (req, res, next) => {
     }
     next();
 }
-module.exports = {
-    signupValidation,
-    loginValidation
-};
+export { signupValidation, loginValidation };

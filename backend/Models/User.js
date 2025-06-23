@@ -25,7 +25,7 @@ const UserSchema = new Schema({
     }
 }, {
     // Add timestamp fields for tracking when user was created/updated
-    timestamps: true // Automatically adds createdAt and updatedAt fields
+    timestamps: true 
 });
 
 // Create and export the User model based on the schema

@@ -1,6 +1,6 @@
 const UserModel = require("../Models/User");
-const bcrypt = require("bcrypt"); // Assuming bcryptjs is used for password hashing
-const jwt = require("jsonwebtoken"); // Assuming jsonwebtoken is used for token generation
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const signup= async (req, res) => {
     try{
@@ -75,7 +75,7 @@ const login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch){
             return res.status(401).json({ 
-                message: "Invalid password", 
+                message: "Invalid email or password", 
                 success:false 
             });
         }

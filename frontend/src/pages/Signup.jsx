@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -6,11 +6,18 @@ function Signup() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    role: 'user'
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -23,7 +30,12 @@ function Signup() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/auth/signup', {
+      const authUrl = import.meta.env.VITE_AUTH_URL;
+      console.log('Auth URL:', authUrl);
+      console.log('Full URL:', `${authUrl}/auth/signup`);
+      console.log('Form data:', formData);
+      
+      const response = await fetch(`${authUrl}/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,7 +43,9 @@ function Signup() {
         body: JSON.stringify(formData),
       });
 
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Response data:', data);
 
       if (response.ok) {
         toast.success('Account created successfully!');
@@ -40,6 +54,7 @@ function Signup() {
         toast.error(data.message || 'Signup failed');
       }
     } catch (error) {
+      console.error('Network error details:', error);
       toast.error('Network error. Please try again.');
     } finally {
       setLoading(false);

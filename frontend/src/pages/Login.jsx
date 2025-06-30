@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -9,7 +9,13 @@ function Login() {
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -22,7 +28,12 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/auth/login', {
+      const authUrl = import.meta.env.VITE_AUTH_URL;
+      console.log('Login Auth URL:', authUrl);
+      console.log('Login Full URL:', `${authUrl}/auth/login`);
+      console.log('Login Form data:', formData);
+      
+      const response = await fetch(`${authUrl}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -30,17 +41,27 @@ function Login() {
         body: JSON.stringify(formData),
       });
 
+      console.log('Login Response status:', response.status);
       const data = await response.json();
+      console.log('Login Response data:', data);
 
       if (response.ok) {
-        localStorage.setItem('token', data.Token);
+        localStorage.setItem('token', data.token);
         localStorage.setItem('loggedInUser', data.user.name);
+        localStorage.setItem('userRole', data.user.role);
         toast.success('Login successful!');
-        navigate('/dashboard');
+        
+        // Redirect based on user role
+        if (data.user.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
         toast.error(data.message || 'Login failed');
       }
     } catch (error) {
+      console.error('Login Network error details:', error);
       toast.error('Network error. Please try again.');
     } finally {
       setLoading(false);

@@ -1,10 +1,9 @@
 import UserModel from "../Models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import cookieParser from "cookie-parser";
 const signup= async (req, res) => {
     try{
-        const { name, email, password } = req.body;
+        const { name, email, password, role = 'user' } = req.body;
         if(!(name && email && password)){
             return res.status(400).json({ 
                 message: "All fields are required", 
@@ -24,29 +23,20 @@ const signup= async (req, res) => {
         const user = await UserModel.create({
             name: name,
             email: email,
-            password: hashedPassword
+            password: hashedPassword,
+            role: role
         });
-        const token = jwt.sign(
-            { 
-                id: user._id, 
-                email: user.email 
-            }, 
-            process.env.SECRET_KEY, 
-            {
-                expiresIn: "24h",
-            }
-        );
         const userResponse = {
             name: user.name,
             email: user.email,
-            id: user._id
+            id: user._id,
+            role: user.role
         };
         // Return success response with token
         return res.status(201).json({
             message: "User registered successfully",
             success: true,
             user: userResponse,
-            token: token
         });
     } catch(err){
         return res.status(500).json({ 
@@ -83,7 +73,8 @@ const login = async (req, res) => {
         const Token = jwt.sign(
             { 
                 userId: user._id, 
-                email: user.email 
+                email: user.email,
+                role: user.role
             },
             process.env.SECRET_KEY,
             { 
@@ -99,7 +90,8 @@ const login = async (req, res) => {
         const userResponse = {
             name: user.name,
             email: user.email,
-            id: user._id
+            id: user._id,
+            role: user.role
         };
         // Return success response with token
         return res.status(200)
@@ -108,7 +100,8 @@ const login = async (req, res) => {
             message: "Login successful", 
             success:true, 
             user: userResponse,
-            token: Token
+            token: Token,
+            redirectTo: user.role === 'admin' ? '/admin' : '/dashboard'
         });
     } catch(err){
         return res.status(500).json({ 

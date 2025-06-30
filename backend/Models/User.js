@@ -22,6 +22,13 @@ const UserSchema = new Schema({
     password: {
         type: String,
         required: true
+    },
+    
+    // User's role - either 'user' or 'admin'
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
     }
 }, {
     // Add timestamp fields for tracking when user was created/updated

@@ -29,10 +29,6 @@ function Login() {
 
     try {
       const authUrl = import.meta.env.VITE_AUTH_URL;
-      console.log('Login Auth URL:', authUrl);
-      console.log('Login Full URL:', `${authUrl}/auth/login`);
-      console.log('Login Form data:', formData);
-      
       const response = await fetch(`${authUrl}/auth/login`, {
         method: 'POST',
         headers: {
@@ -43,7 +39,6 @@ function Login() {
 
       console.log('Login Response status:', response.status);
       const data = await response.json();
-      console.log('Login Response data:', data);
 
       if (response.ok) {
         localStorage.setItem('token', data.token);

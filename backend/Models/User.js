@@ -1,6 +1,22 @@
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
+// Define a schema for solved problems
+// This schema will be used to store details of problems solved by the user
+const solvedSchema = new Schema({
+  title: {
+    type: String,
+    required: true,
+  },
+  difficulty: {
+    type: String,
+    required: true,
+  },
+  codingScore: {
+    type: Number,
+    required: true,
+  },
+});
 const UserSchema = new Schema({
     // User's first name - optional field with string type
     name: {
@@ -29,6 +45,11 @@ const UserSchema = new Schema({
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
+    },
+    // Array of solved problems with details
+    solvedProblems: {
+        type: [solvedSchema], // Array of solved problems
+        default: [] // Default to empty array if no problems solved
     }
 }, {
     // Add timestamp fields for tracking when user was created/updated

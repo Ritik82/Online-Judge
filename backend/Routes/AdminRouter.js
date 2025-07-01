@@ -3,7 +3,11 @@ import {
     getAdminDashboard, 
     getAllUsers, 
     updateUserRole, 
-    deleteUser 
+    deleteUser,
+    createProblem,
+    getAllProblems,
+    updateProblem,
+    deleteProblem
 } from '../Controllers/AdminController.js';
 import { verifyToken, isAdmin } from '../Middlewares/AdminMiddleware.js';
 
@@ -16,13 +20,15 @@ router.use(isAdmin);
 // Get admin dashboard data
 router.get('/dashboard', getAdminDashboard);
 
-// Get all users
+// User management routes
 router.get('/users', getAllUsers);
-
-// Update user role
 router.put('/users/role', updateUserRole);
-
-// Delete user
 router.delete('/users/:userId', deleteUser);
+
+// Problem management routes
+router.post('/problems', createProblem);
+router.get('/problems', getAllProblems);
+router.put('/problems/:problemId', updateProblem);
+router.delete('/problems/:problemId', deleteProblem);
 
 export default router;

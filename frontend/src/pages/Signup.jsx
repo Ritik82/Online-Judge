@@ -31,9 +31,6 @@ function Signup() {
 
     try {
       const authUrl = import.meta.env.VITE_AUTH_URL;
-      console.log('Auth URL:', authUrl);
-      console.log('Full URL:', `${authUrl}/auth/signup`);
-      console.log('Form data:', formData);
       
       const response = await fetch(`${authUrl}/auth/signup`, {
         method: 'POST',
@@ -45,7 +42,6 @@ function Signup() {
 
       console.log('Response status:', response.status);
       const data = await response.json();
-      console.log('Response data:', data);
 
       if (response.ok) {
         toast.success('Account created successfully!');

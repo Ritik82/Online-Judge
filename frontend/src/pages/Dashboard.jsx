@@ -68,9 +68,12 @@ function Dashboard() {
                   </div>
                   <h3 className="text-xl font-semibold text-white mb-4">Problems</h3>
                   <p className="text-gray-400 mb-6 flex-1">Browse and solve coding problems to improve your skills</p>
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200 w-full">
+                  <Link
+                    to="/problems"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200 inline-block text-center w-full"
+                  >
                     View Problems
-                  </button>
+                  </Link>
                 </div>
               </div>
               

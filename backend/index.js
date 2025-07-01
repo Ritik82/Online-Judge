@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import cors from 'cors';
 import AuthRouter from './Routes/AuthRouter.js';
 import AdminRouter from './Routes/AdminRouter.js';
+import ProblemRouter from './Routes/ProblemRouter.js';
 import dotenv from 'dotenv';
 dotenv.config();
 import { DBConnection } from './Models/db.js';
@@ -23,6 +24,8 @@ app.use(cookieParser());
 app.use('/auth', AuthRouter);
 // Use the AdminRouter for admin-related routes
 app.use('/admin', AdminRouter);
+// Use the ProblemRouter for problem-related routes
+app.use('/problems', ProblemRouter);
 
 
 await DBConnection();

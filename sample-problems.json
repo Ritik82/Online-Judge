@@ -1,0 +1,205 @@
+[
+  {
+    "title": "Two Sum",
+    "description": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.\n\nExample 1:\nInput: nums = [2,7,11,15], target = 9\nOutput: [0,1]\nExplanation: Because nums[0] + nums[1] == 9, we return [0, 1].\n\nExample 2:\nInput: nums = [3,2,4], target = 6\nOutput: [1,2]\n\nExample 3:\nInput: nums = [3,3], target = 6\nOutput: [0,1]",
+    "difficulty": "Easy",
+    "tags": ["Array", "Hash Table"],
+    "inputFormat": "First line contains an array of integers nums in JSON format.\nSecond line contains the target integer.",
+    "outputFormat": "Return an array of two indices [i, j] where nums[i] + nums[j] = target.",
+    "sampleInput": "[2,7,11,15]\n9",
+    "sampleOutput": "[0,1]",
+    "testCases": [
+      {"input": "[2,7,11,15]\n9", "output": "[0,1]"},
+      {"input": "[3,2,4]\n6", "output": "[1,2]"},
+      {"input": "[3,3]\n6", "output": "[0,1]"}
+    ],
+    "hiddenTestcases": [
+      {"input": "[1,2,3,4,5]\n9", "output": "[3,4]"},
+      {"input": "[-1,-2,-3,-4,-5]\n-8", "output": "[2,4]"},
+      {"input": "[0,4,3,0]\n0", "output": "[0,3]"}
+    ]
+  },
+  {
+    "title": "Palindrome Number",
+    "description": "Given an integer x, return true if x is a palindrome integer.\n\nAn integer is a palindrome when it reads the same backward as forward.\n\nFor example, 121 is a palindrome while 123 is not.\n\nExample 1:\nInput: x = 121\nOutput: true\nExplanation: 121 reads as 121 from left to right and from right to left.\n\nExample 2:\nInput: x = -121\nOutput: false\nExplanation: From left to right, it reads -121. From right to left, it becomes 121-. Therefore it is not a palindrome.\n\nExample 3:\nInput: x = 10\nOutput: false\nExplanation: Reads 01 from right to left. Therefore it is not a palindrome.",
+    "difficulty": "Easy",
+    "tags": ["Math"],
+    "inputFormat": "A single integer x.",
+    "outputFormat": "Return true if x is a palindrome, false otherwise.",
+    "sampleInput": "121",
+    "sampleOutput": "true",
+    "testCases": [
+      {"input": "121", "output": "true"},
+      {"input": "-121", "output": "false"},
+      {"input": "10", "output": "false"}
+    ],
+    "hiddenTestcases": [
+      {"input": "0", "output": "true"},
+      {"input": "1221", "output": "true"},
+      {"input": "12321", "output": "true"},
+      {"input": "123", "output": "false"}
+    ]
+  },
+  {
+    "title": "Valid Parentheses",
+    "description": "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.\n\nAn input string is valid if:\n1. Open brackets must be closed by the same type of brackets.\n2. Open brackets must be closed in the correct order.\n3. Every close bracket has a corresponding open bracket of the same type.\n\nExample 1:\nInput: s = \"()\"\nOutput: true\n\nExample 2:\nInput: s = \"()[]{}\"\nOutput: true\n\nExample 3:\nInput: s = \"(]\"\nOutput: false",
+    "difficulty": "Easy",
+    "tags": ["String", "Stack"],
+    "inputFormat": "A string s containing only parentheses characters.",
+    "outputFormat": "Return true if the string is valid, false otherwise.",
+    "sampleInput": "()",
+    "sampleOutput": "true",
+    "testCases": [
+      {"input": "()", "output": "true"},
+      {"input": "()[]{}", "output": "true"},
+      {"input": "(]", "output": "false"}
+    ],
+    "hiddenTestcases": [
+      {"input": "([)]", "output": "false"},
+      {"input": "{[]}", "output": "true"},
+      {"input": "", "output": "true"},
+      {"input": "((", "output": "false"}
+    ]
+  },
+  {
+    "title": "Add Two Numbers",
+    "description": "You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.\n\nYou may assume the two numbers do not contain any leading zero, except the number 0 itself.\n\nFor this problem, represent linked lists as arrays where each element is a digit.\n\nExample 1:\nInput: l1 = [2,4,3], l2 = [5,6,4]\nOutput: [7,0,8]\nExplanation: 342 + 465 = 807.\n\nExample 2:\nInput: l1 = [0], l2 = [0]\nOutput: [0]\n\nExample 3:\nInput: l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9]\nOutput: [8,9,9,9,0,0,0,1]",
+    "difficulty": "Medium",
+    "tags": ["Linked List", "Math", "Recursion"],
+    "inputFormat": "Two lines, each containing an array representing a linked list in reverse order.",
+    "outputFormat": "Return an array representing the sum as a linked list in reverse order.",
+    "sampleInput": "[2,4,3]\n[5,6,4]",
+    "sampleOutput": "[7,0,8]",
+    "testCases": [
+      {"input": "[2,4,3]\n[5,6,4]", "output": "[7,0,8]"},
+      {"input": "[0]\n[0]", "output": "[0]"},
+      {"input": "[9,9,9,9,9,9,9]\n[9,9,9,9]", "output": "[8,9,9,9,0,0,0,1]"}
+    ],
+    "hiddenTestcases": [
+      {"input": "[1,2,3]\n[4,5,6]", "output": "[5,7,9]"},
+      {"input": "[5]\n[5]", "output": "[0,1]"},
+      {"input": "[1,8]\n[0]", "output": "[1,8]"}
+    ]
+  },
+  {
+    "title": "Longest Substring Without Repeating Characters",
+    "description": "Given a string s, find the length of the longest substring without repeating characters.\n\nExample 1:\nInput: s = \"abcabcbb\"\nOutput: 3\nExplanation: The answer is \"abc\", with the length of 3.\n\nExample 2:\nInput: s = \"bbbbb\"\nOutput: 1\nExplanation: The answer is \"b\", with the length of 1.\n\nExample 3:\nInput: s = \"pwwkew\"\nOutput: 3\nExplanation: The answer is \"wke\", with the length of 3.\nNotice that the answer must be a substring, \"pwke\" is a subsequence and not a substring.",
+    "difficulty": "Medium",
+    "tags": ["Hash Table", "String", "Sliding Window"],
+    "inputFormat": "A string s.",
+    "outputFormat": "Return the length of the longest substring without repeating characters.",
+    "sampleInput": "abcabcbb",
+    "sampleOutput": "3",
+    "testCases": [
+      {"input": "abcabcbb", "output": "3"},
+      {"input": "bbbbb", "output": "1"},
+      {"input": "pwwkew", "output": "3"}
+    ],
+    "hiddenTestcases": [
+      {"input": "", "output": "0"},
+      {"input": "au", "output": "2"},
+      {"input": "dvdf", "output": "3"},
+      {"input": "anviaj", "output": "5"}
+    ]
+  },
+  {
+    "title": "Container With Most Water",
+    "description": "You are given an integer array height of length n. There are n vertical lines drawn such that the two endpoints of the ith line are (i, 0) and (i, height[i]).\n\nFind two lines that together with the x-axis form a container that contains the most water.\n\nReturn the maximum amount of water a container can store.\n\nNotice that you may not slant the container.\n\nExample 1:\nInput: height = [1,8,6,2,5,4,8,3,7]\nOutput: 49\nExplanation: The above vertical lines are represented by array [1,8,6,2,5,4,8,3,7]. In this case, the max area of water (blue section) the container can contain is 49.\n\nExample 2:\nInput: height = [1,1]\nOutput: 1",
+    "difficulty": "Medium",
+    "tags": ["Array", "Two Pointers", "Greedy"],
+    "inputFormat": "An array of integers representing the height of vertical lines.",
+    "outputFormat": "Return the maximum area of water that can be contained.",
+    "sampleInput": "[1,8,6,2,5,4,8,3,7]",
+    "sampleOutput": "49",
+    "testCases": [
+      {"input": "[1,8,6,2,5,4,8,3,7]", "output": "49"},
+      {"input": "[1,1]", "output": "1"},
+      {"input": "[4,3,2,1,4]", "output": "16"}
+    ],
+    "hiddenTestcases": [
+      {"input": "[1,2,1]", "output": "2"},
+      {"input": "[2,1]", "output": "1"},
+      {"input": "[1,2,4,3]", "output": "4"}
+    ]
+  },
+  {
+    "title": "Merge k Sorted Lists",
+    "description": "You are given an array of k linked-lists, each linked-list is sorted in ascending order.\n\nMerge all the linked-lists into one sorted linked-list and return it.\n\nFor this problem, represent linked lists as arrays.\n\nExample 1:\nInput: lists = [[1,4,5],[1,3,4],[2,6]]\nOutput: [1,1,2,3,4,4,5,6]\nExplanation: The linked-lists are:\n[\n  1->4->5,\n  1->3->4,\n  2->6\n]\nmerging them into one sorted list:\n1->1->2->3->4->4->5->6\n\nExample 2:\nInput: lists = []\nOutput: []\n\nExample 3:\nInput: lists = [[]]\nOutput: []",
+    "difficulty": "Hard",
+    "tags": ["Linked List", "Divide and Conquer", "Heap", "Merge Sort"],
+    "inputFormat": "An array of arrays, where each sub-array represents a sorted linked list.",
+    "outputFormat": "Return a single sorted array representing the merged linked list.",
+    "sampleInput": "[[1,4,5],[1,3,4],[2,6]]",
+    "sampleOutput": "[1,1,2,3,4,4,5,6]",
+    "testCases": [
+      {"input": "[[1,4,5],[1,3,4],[2,6]]", "output": "[1,1,2,3,4,4,5,6]"},
+      {"input": "[]", "output": "[]"},
+      {"input": "[[]]", "output": "[]"}
+    ],
+    "hiddenTestcases": [
+      {"input": "[[1,2,3],[4,5,6]]", "output": "[1,2,3,4,5,6]"},
+      {"input": "[[1],[0]]", "output": "[0,1]"},
+      {"input": "[[2],[1,1,1]]", "output": "[1,1,1,2]"}
+    ]
+  },
+  {
+    "title": "Median of Two Sorted Arrays",
+    "description": "Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.\n\nThe overall run time complexity should be O(log (m+n)).\n\nExample 1:\nInput: nums1 = [1,3], nums2 = [2]\nOutput: 2.00000\nExplanation: merged array = [1,2,3] and median is 2.\n\nExample 2:\nInput: nums1 = [1,2], nums2 = [3,4]\nOutput: 2.50000\nExplanation: merged array = [1,2,3,4] and median is (2 + 3) / 2 = 2.5.",
+    "difficulty": "Hard",
+    "tags": ["Array", "Binary Search", "Divide and Conquer"],
+    "inputFormat": "Two lines, each containing a sorted array of integers.",
+    "outputFormat": "Return the median of the two sorted arrays as a decimal number with 5 decimal places.",
+    "sampleInput": "[1,3]\n[2]",
+    "sampleOutput": "2.00000",
+    "testCases": [
+      {"input": "[1,3]\n[2]", "output": "2.00000"},
+      {"input": "[1,2]\n[3,4]", "output": "2.50000"},
+      {"input": "[0,0]\n[0,0]", "output": "0.00000"}
+    ],
+    "hiddenTestcases": [
+      {"input": "[]\n[1]", "output": "1.00000"},
+      {"input": "[2]\n[]", "output": "2.00000"},
+      {"input": "[1,2,3,4,5]\n[6,7,8,9,10]", "output": "5.50000"}
+    ]
+  },
+  {
+    "title": "Regular Expression Matching",
+    "description": "Given an input string s and a pattern p, implement regular expression matching with support for '.' and '*' where:\n\n'.' Matches any single character.\n'*' Matches zero or more of the preceding element.\n\nThe matching should cover the entire input string (not partial).\n\nExample 1:\nInput: s = \"aa\", p = \"a\"\nOutput: false\nExplanation: \"a\" does not match the entire string \"aa\".\n\nExample 2:\nInput: s = \"aa\", p = \"a*\"\nOutput: true\nExplanation: '*' means zero or more of the preceding element, 'a'. Therefore, by repeating 'a' once, it becomes \"aa\".\n\nExample 3:\nInput: s = \"ab\", p = \".*\"\nOutput: true\nExplanation: \".*\" means \"zero or more (*) of any character (.)\".",
+    "difficulty": "Hard",
+    "tags": ["String", "Dynamic Programming", "Recursion"],
+    "inputFormat": "Two lines: the input string s and the pattern p.",
+    "outputFormat": "Return true if s matches p, false otherwise.",
+    "sampleInput": "aa\na",
+    "sampleOutput": "false",
+    "testCases": [
+      {"input": "aa\na", "output": "false"},
+      {"input": "aa\na*", "output": "true"},
+      {"input": "ab\n.*", "output": "true"}
+    ],
+    "hiddenTestcases": [
+      {"input": "mississippi\nmis*is*p*.", "output": "false"},
+      {"input": "ab\n.*c", "output": "false"},
+      {"input": "aab\nc*a*b", "output": "true"}
+    ]
+  },
+  {
+    "title": "N-Queens",
+    "description": "The n-queens puzzle is the problem of placing n queens on an n×n chessboard such that no two queens attack each other.\n\nGiven an integer n, return all distinct solutions to the n-queens puzzle. You may return the answer in any order.\n\nEach solution contains a distinct board configuration of the n-queens' placement, where 'Q' and '.' both indicate a queen and an empty space, respectively.\n\nExample 1:\nInput: n = 4\nOutput: [[\".Q..\",\"...Q\",\"Q...\",\"..Q.\"],[\".Q..\",\"...Q\",\"Q...\",\"..Q.\"]]\nExplanation: There exist two distinct solutions to the 4-queens puzzle as shown above\n\nExample 2:\nInput: n = 1\nOutput: [[\"Q\"]]",
+    "difficulty": "Hard",
+    "tags": ["Array", "Backtracking"],
+    "inputFormat": "A single integer n representing the size of the chessboard.",
+    "outputFormat": "Return the number of distinct solutions (not the actual solutions for simplicity).",
+    "sampleInput": "4",
+    "sampleOutput": "2",
+    "testCases": [
+      {"input": "4", "output": "2"},
+      {"input": "1", "output": "1"},
+      {"input": "8", "output": "92"}
+    ],
+    "hiddenTestcases": [
+      {"input": "2", "output": "0"},
+      {"input": "3", "output": "0"},
+      {"input": "5", "output": "10"}
+    ]
+  }
+]

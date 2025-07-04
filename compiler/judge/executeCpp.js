@@ -1,7 +1,7 @@
-const { exec } = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const { cleanErrorMessage } = require("./errorCleaner");
+const { v4: uuid } = require("uuid");
+const { exec } = require("child_process");
 
 const outputPath = path.join(__dirname, "outputs");
 const inputPath = path.join(__dirname, "inputs");
@@ -14,39 +14,58 @@ if (!fs.existsSync(inputPath)) {
     fs.mkdirSync(inputPath, { recursive: true });
 }
 
-const executeCpp = (filepath, inputData = '') => {
-    const jobId = path.basename(filepath).split(".")[0];
-    const outPath = path.join(outputPath, `${jobId}.exe`);
-    const inputFilePath = path.join(inputPath, `${jobId}_input.txt`);
+const cleanErrorMessage = (errorMessage, type) => {
+    // Simple error cleaner for judge execution
+    if (!errorMessage) return "Unknown error";
+    
+    // Remove file paths from error messages
+    let cleaned = errorMessage.replace(/\/.*?\//g, '');
+    cleaned = cleaned.replace(/\\.*?\\/g, '');
+    
+    return cleaned;
+};
 
+// Execute C++ for judging (no cleanup until all test cases complete)
+const executeCppJudge = (filepath, inputData = '') => {
     return new Promise((resolve, reject) => {
-        // Compile C++ file with additional flags for better compatibility
-        const compileCommand = `g++ -std=c++17 -O2 -Wall -Wextra -DONLINE_JUDGE "${filepath}" -o "${outPath}"`;
+        if (!fs.existsSync(filepath)) {
+            return reject("Source file not found");
+        }
+
+        const jobID = uuid();
+        const inputFilePath = path.join(inputPath, `${jobID}.txt`);
+        const outPath = path.join(outputPath, `${jobID}.exe`);
+
+        // Write input data to file
+        try {
+            fs.writeFileSync(inputFilePath, inputData || '');
+        } catch (error) {
+            return reject(`Failed to write input file: ${error.message}`);
+        }
+
+        // Compile the C++ code
+        const compileCommand = `g++ "${filepath}" -o "${outPath}"`;
         
-        exec(compileCommand, (compileError, compileStdout, compileStderr) => {
+        exec(compileCommand, {
+            timeout: 15000,
+            windowsHide: true
+        }, (compileError, compileStdout, compileStderr) => {
             if (compileError) {
-                // Clean up source file on compilation error
-                if (fs.existsSync(filepath)) {
-                    fs.unlinkSync(filepath);
+                // Clean up input file only
+                if (fs.existsSync(inputFilePath)) {
+                    try { fs.unlinkSync(inputFilePath); } catch (e) {}
                 }
-                reject(cleanErrorMessage(compileStderr, 'Compilation'));
-                return;
+                
+                return reject(cleanErrorMessage(compileStderr || compileError.message, 'Compile'));
             }
 
-            // Prepare execution command
+            // Execute the compiled program
             let executeCommand;
-            
             if (inputData && inputData.trim()) {
-                // Write input to file and use redirection
-                try {
-                    fs.writeFileSync(inputFilePath, inputData, 'utf8');
+                if (process.platform === 'win32') {
                     executeCommand = `"${outPath}" < "${inputFilePath}"`;
-                } catch (writeError) {
-                    // Clean up on write error
-                    if (fs.existsSync(outPath)) fs.unlinkSync(outPath);
-                    if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
-                    reject(cleanErrorMessage(`Input File Error: ${writeError.message}`, 'System'));
-                    return;
+                } else {
+                    executeCommand = `"${outPath}" < "${inputFilePath}"`;
                 }
             } else {
                 executeCommand = `"${outPath}"`;
@@ -59,8 +78,8 @@ const executeCpp = (filepath, inputData = '') => {
                 killSignal: 'SIGTERM',
                 windowsHide: true
             }, (execError, execStdout, execStderr) => {
-                // Clean up files regardless of outcome
-                const filesToCleanup = [inputFilePath, outPath, filepath];
+                // Clean up temporary files but NOT the source file
+                const filesToCleanup = [inputFilePath, outPath];
                 filesToCleanup.forEach(file => {
                     if (fs.existsSync(file)) {
                         try {
@@ -94,5 +113,5 @@ const executeCpp = (filepath, inputData = '') => {
 };
 
 module.exports = {
-    executeCpp,
+    executeCppNoCleanup: executeCppJudge,
 };

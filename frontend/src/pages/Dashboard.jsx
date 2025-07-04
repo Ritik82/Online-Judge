@@ -120,9 +120,12 @@ function Dashboard() {
                   </div>
                   <h3 className="text-xl font-semibold text-white mb-4">Profile</h3>
                   <p className="text-gray-400 mb-6 flex-1">View your submission history and track your progress</p>
-                  <button className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition duration-200 w-full">
+                  <Link
+                    to={`/profile/${user}`}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition duration-200 inline-block text-center w-full"
+                  >
                     My Profile
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>

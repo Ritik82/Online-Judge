@@ -30,9 +30,6 @@ function Problems() {
       const apiUrl = import.meta.env.VITE_API_URL;
       const token = localStorage.getItem('token');
       
-      console.log('API URL:', apiUrl);
-      console.log('Token exists:', !!token);
-      
       if (!token) {
         toast.error('Authentication required');
         navigate('/login');
@@ -45,7 +42,6 @@ function Problems() {
       if (filter.tag) params.append('tags', filter.tag);
       
       const url = `${apiUrl}/problems?${params.toString()}`;
-      console.log('Fetching from URL:', url);
       
       const response = await fetch(url, {
         headers: {
@@ -54,11 +50,8 @@ function Problems() {
         }
       });
       
-      console.log('Response status:', response.status);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('Problems data:', data);
         setProblems(data.problems || []);
       } else if (response.status === 401) {
         toast.error('Session expired. Please login again.');
@@ -67,11 +60,9 @@ function Problems() {
         navigate('/login');
       } else {
         const errorData = await response.text();
-        console.error('Error response:', errorData);
         toast.error('Failed to fetch problems');
       }
     } catch (error) {
-      console.error('Error fetching problems:', error);
       toast.error('Error loading problems');
     } finally {
       setLoading(false);
@@ -140,7 +131,16 @@ function Problems() {
               </Link>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-300">Welcome, {user}!</span>
+              <span className="text-gray-300">
+                Welcome,{" "}
+                <Link
+                  to={`/profile/${user}`}
+                  className="text-blue-400 hover:text-blue-300 transition duration-200"
+                >
+                  {user}
+                </Link>
+                !
+              </span>
               
               <button
                 onClick={handleLogout}
@@ -225,34 +225,37 @@ function Problems() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-2">
               {problems.map((problem, index) => (
                 <div
                   key={problem._id}
-                  className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-blue-500 transition duration-200"
+                  onClick={() => navigate(`/problem/${problem._id}`)}
+                  className="bg-gray-800 rounded-lg p-2 border border-gray-700 hover:border-blue-500 transition duration-200 cursor-pointer"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="text-gray-400 font-medium text-sm min-w-[2rem]">
                         #{index + 1}
                       </span>
-                      <h3 className="text-lg font-semibold text-white">
+                      <h3 className="text-sm font-semibold text-white">
                         {problem.title}
                       </h3>
+                      {problem.tags && problem.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 ml-2">
+                          {problem.tags.slice(0, 3).map((tag, tagIndex) => (
+                            <span
+                              key={tagIndex}
+                              className={`px-1.5 py-0.5 rounded-full text-xs font-medium border ${getTagColor(tagIndex)}`}
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                          {problem.tags.length > 3 && (
+                            <span className="text-gray-400 text-xs">+{problem.tags.length - 3}</span>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    
-                    {problem.tags && problem.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 justify-center flex-1">
-                        {problem.tags.map((tag, tagIndex) => (
-                          <span
-                            key={tagIndex}
-                            className={`px-2 py-1 rounded-full text-xs font-medium border ${getTagColor(tagIndex)}`}
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
                     
                     <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(problem.difficulty)} whitespace-nowrap`}>
                       {problem.difficulty}

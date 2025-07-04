@@ -1,6 +1,7 @@
 const { exec, spawn } = require("child_process");
 const fs = require("fs");
 const path = require("path");
+const { cleanErrorMessage } = require("./errorCleaner");
 
 const outputPath = path.join(__dirname, "outputs");
 const inputPath = path.join(__dirname, "inputs");
@@ -36,7 +37,7 @@ const executeJava = (filepath, inputData = '') => {
                     if (fs.existsSync(filepath)) {
                         fs.unlinkSync(filepath);
                     }
-                    reject(`Compilation Error: ${compileStderr}`);
+                    reject(cleanErrorMessage(compileStderr, 'Compilation'));
                     return;
                 }
 
@@ -86,12 +87,12 @@ const executeJava = (filepath, inputData = '') => {
                     });
 
                     if (code !== 0) {
-                        reject(`Runtime Error: Process exited with code ${code}\n${errorOutput}`);
+                        reject(cleanErrorMessage(`Process exited with code ${code}\n${errorOutput}`, 'Runtime'));
                         return;
                     }
 
                     if (errorOutput.trim()) {
-                        reject(`Runtime Error: ${errorOutput}`);
+                        reject(cleanErrorMessage(errorOutput, 'Runtime'));
                         return;
                     }
 
@@ -116,11 +117,11 @@ const executeJava = (filepath, inputData = '') => {
                         }
                     });
 
-                    reject(`Runtime Error: ${error.message}`);
+                    reject(cleanErrorMessage(error.message, 'Runtime'));
                 });
             });
         } catch (fileError) {
-            reject(`File Error: ${fileError.message}`);
+            reject(cleanErrorMessage(fileError.message, 'File'));
         }
     });
 };

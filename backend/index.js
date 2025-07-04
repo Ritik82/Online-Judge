@@ -6,6 +6,7 @@ import cors from 'cors';
 import AuthRouter from './Routes/AuthRouter.js';
 import AdminRouter from './Routes/AdminRouter.js';
 import ProblemRouter from './Routes/ProblemRouter.js';
+import ProfileRouter from './Routes/ProfileRouter.js';
 import dotenv from 'dotenv';
 dotenv.config();
 import { DBConnection } from './Models/db.js';
@@ -20,12 +21,20 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-// Use the AuthRouter for authentication-related routes
+
+// Add logging middleware
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`);
+    next();
+});
+
 app.use('/auth', AuthRouter);
-// Use the AdminRouter for admin-related routes
+
 app.use('/admin', AdminRouter);
-// Use the ProblemRouter for problem-related routes
+
 app.use('/problems', ProblemRouter);
+
+app.use('/api', ProfileRouter);
 
 
 await DBConnection();

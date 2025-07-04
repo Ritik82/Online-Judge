@@ -1,10 +1,9 @@
 const { spawn } = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const { cleanErrorMessage } = require("./errorCleaner");
 
-const outputPath = path.join(__dirname, "outputs");
-const inputPath = path.join(__dirname, "inputs");
+const outputPath = path.join(__dirname, "..", "online-compiler", "outputs");
+const inputPath = path.join(__dirname, "..", "online-compiler", "inputs");
 
 // Create directories if they don't exist
 if (!fs.existsSync(outputPath)) {
@@ -14,7 +13,20 @@ if (!fs.existsSync(inputPath)) {
     fs.mkdirSync(inputPath, { recursive: true });
 }
 
-const executePython = (filepath, inputData = '') => {
+const cleanErrorMessage = (errorMessage, type) => {
+    // Simple error cleaner for judge execution
+    if (!errorMessage) return "Unknown error";
+    
+    // Remove file paths from error messages
+    let cleaned = errorMessage.replace(/File ".*?source\.py"/, 'File "source.py"');
+    cleaned = cleaned.replace(/\/.*?\/source\.py/, 'source.py');
+    cleaned = cleaned.replace(/\\.*?\\source\.py/, 'source.py');
+    
+    return cleaned;
+};
+
+// Execute Python for judging (no cleanup until all test cases complete)
+const executePythonJudge = (filepath, inputData = '') => {
     return new Promise((resolve, reject) => {
         // Execute Python program using spawn
         const pythonCommand = process.platform === 'win32' ? 'python' : 'python3';
@@ -45,15 +57,8 @@ const executePython = (filepath, inputData = '') => {
 
         // Handle process completion
         child.on('close', (code) => {
-            // Clean up source file
-            if (fs.existsSync(filepath)) {
-                try {
-                    fs.unlinkSync(filepath);
-                } catch (cleanupError) {
-                    console.warn(`Failed to cleanup ${filepath}:`, cleanupError.message);
-                }
-            }
-
+            // DON'T clean up source file - leave it for other test cases
+            
             if (code !== 0) {
                 reject(cleanErrorMessage(`Process exited with code ${code}\n${errorOutput}`, 'Runtime'));
                 return;
@@ -69,20 +74,12 @@ const executePython = (filepath, inputData = '') => {
 
         // Handle process errors
         child.on('error', (error) => {
-            // Clean up source file
-            if (fs.existsSync(filepath)) {
-                try {
-                    fs.unlinkSync(filepath);
-                } catch (cleanupError) {
-                    console.warn(`Failed to cleanup ${filepath}:`, cleanupError.message);
-                }
-            }
-
+            // DON'T clean up source file - leave it for other test cases
             reject(cleanErrorMessage(error.message, 'Runtime'));
         });
     });
 };
 
 module.exports = {
-    executePython,
+    executePythonNoCleanup: executePythonJudge
 };

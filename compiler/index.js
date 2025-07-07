@@ -15,8 +15,21 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ 
+        success: true, 
+        message: 'Compiler service is running',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        supportedLanguages: ['cpp', 'java', 'python']
+    });
+});
+
 app.use('/api/compiler', compRouter);
 app.use('/api/judge', judgeRouter);
+// Also add direct routes for easier access
+app.use('/judge', judgeRouter);
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {

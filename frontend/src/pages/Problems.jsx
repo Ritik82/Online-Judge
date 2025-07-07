@@ -129,6 +129,9 @@ function Problems() {
               <Link to="/dashboard" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200">
                 Dashboard
               </Link>
+              <Link to="/leaderboard" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200">
+                Leaderboard
+              </Link>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-gray-300">

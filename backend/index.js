@@ -7,6 +7,7 @@ import AuthRouter from './Routes/AuthRouter.js';
 import AdminRouter from './Routes/AdminRouter.js';
 import ProblemRouter from './Routes/ProblemRouter.js';
 import ProfileRouter from './Routes/ProfileRouter.js';
+import LeaderboardRouter from './Routes/LeaderboardRouter.js';
 import dotenv from 'dotenv';
 dotenv.config();
 import { DBConnection } from './Models/db.js';
@@ -15,6 +16,16 @@ const PORT = process.env.PORT;
 
 app.get('/', (req, res) => {
     res.send('Hello, World!');
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ 
+        success: true, 
+        message: 'Backend server is running',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
 });
 
 app.use(cors());
@@ -35,6 +46,8 @@ app.use('/admin', AdminRouter);
 app.use('/problems', ProblemRouter);
 
 app.use('/api', ProfileRouter);
+
+app.use('/leaderboard', LeaderboardRouter);
 
 
 await DBConnection();

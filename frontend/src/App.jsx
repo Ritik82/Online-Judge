@@ -9,6 +9,7 @@ import Admin from './pages/Admin'
 import Problems from './pages/Problems'
 import ProblemSolving from './pages/ProblemSolving'
 import Profile from './pages/Profile'
+import Leaderboard from './pages/Leaderboard'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path='/problems' element={<Problems />} />
         <Route path='/problem/:problemId' element={<ProblemSolving />} />
         <Route path='/profile/:username' element={<Profile />} />
+        <Route path='/leaderboard' element={<Leaderboard />} />
       </Routes>
     </div>
   )

@@ -30,14 +30,10 @@ export const getUserProfile = async (req, res) => {
             'status.success': true 
         });
 
-        console.log('Unique problems solved titles:', uniqueProblemTitles);
-
         // Get detailed information about solved problems
         const solvedProblemsDetails = await Problem.find({ 
             title: { $in: uniqueProblemTitles } 
         }).select('title difficulty codingScore tags');
-
-        console.log('Solved problems details:', solvedProblemsDetails);
 
         // Calculate acceptance rate
         const acceptanceRate = totalSubmissions > 0 ? 
@@ -52,8 +48,6 @@ export const getUserProfile = async (req, res) => {
             difficultyStats[difficulty] = (difficultyStats[difficulty] || 0) + 1;
             totalScore += problem.codingScore || 100; // Default to 100 if no coding score
         }
-
-        console.log('Calculated stats:', { difficultyStats, totalScore });
 
         const profileData = {
             user: {
@@ -72,8 +66,6 @@ export const getUserProfile = async (req, res) => {
                 difficultyStats
             }
         };
-
-        console.log('Final profile data:', JSON.stringify(profileData, null, 2));
 
         res.status(200).json({
             success: true,
@@ -142,83 +134,6 @@ export const getUserSubmissions = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Internal server error'
-        });
-    }
-};
-
-// Debug function to check database contents
-export const debugDatabaseContents = async (req, res) => {
-    try {
-        const { username } = req.params;
-        console.log('=== DEBUG DATABASE CONTENTS ===');
-        console.log('Username parameter:', username);
-        
-        // Check all users
-        const allUsers = await UserModel.find({}).select('name email');
-        console.log('All users in database:', allUsers.map(u => u.name));
-        
-        // Check all submissions with details
-        const allSubmissions = await Submission.find({}).limit(10);
-        console.log('Sample submissions in database:', allSubmissions.map(s => ({
-            username: s.username,
-            title: s.title,
-            status: s.status,
-            lang: s.lang,
-            timestamp: s.timestamp
-        })));
-        
-        // Check submissions for specific username
-        const userSubmissions = await Submission.find({ username });
-        console.log(`Submissions for username "${username}":`, userSubmissions.map(s => ({
-            title: s.title,
-            status: s.status,
-            lang: s.lang,
-            timestamp: s.timestamp
-        })));
-        
-        // Check specific username patterns
-        const usernameVariations = await Submission.find({
-            username: { $regex: username, $options: 'i' }
-        });
-        console.log(`Username variations for "${username}":`, usernameVariations.map(s => s.username));
-        
-        // Check all problems
-        const allProblems = await Problem.find({}).select('title difficulty codingScore').limit(10);
-        console.log('Sample problems:', allProblems.map(p => ({
-            title: p.title,
-            difficulty: p.difficulty,
-            codingScore: p.codingScore
-        })));
-        
-        res.json({
-            success: true,
-            debug: {
-                usernameSearched: username,
-                totalUsers: allUsers.length,
-                userNames: allUsers.map(u => u.name),
-                totalSubmissions: await Submission.countDocuments({}),
-                userSubmissionsCount: userSubmissions.length,
-                userSubmissions: userSubmissions.map(s => ({
-                    title: s.title,
-                    status: s.status,
-                    lang: s.lang,
-                    timestamp: s.timestamp
-                })),
-                usernameVariations: usernameVariations.map(s => s.username),
-                totalProblems: await Problem.countDocuments({}),
-                sampleProblems: allProblems.map(p => ({
-                    title: p.title,
-                    difficulty: p.difficulty,
-                    codingScore: p.codingScore
-                }))
-            }
-        });
-        
-    } catch (error) {
-        console.error('Debug error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Debug error: ' + error.message
         });
     }
 };

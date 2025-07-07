@@ -58,7 +58,7 @@ function Dashboard() {
             </p>
             
             {/* Grid with cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-12">
               <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-blue-500 transition duration-200">
                 <div className="flex flex-col h-full">
                   <div className="mb-4">
@@ -73,6 +73,24 @@ function Dashboard() {
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200 inline-block text-center w-full"
                   >
                     View Problems
+                  </Link>
+                </div>
+              </div>
+              
+              <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-yellow-500 transition duration-200">
+                <div className="flex flex-col h-full">
+                  <div className="mb-4">
+                    <svg className="w-12 h-12 text-yellow-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-4">Leaderboard</h3>
+                  <p className="text-gray-400 mb-6 flex-1">See how you rank among other competitive programmers</p>
+                  <Link
+                    to="/leaderboard"
+                    className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition duration-200 inline-block text-center w-full"
+                  >
+                    View Rankings
                   </Link>
                 </div>
               </div>

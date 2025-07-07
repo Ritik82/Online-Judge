@@ -10,6 +10,22 @@ if (!process.env.MONGODB_URL) {
     dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 }
 
+// Import stats utility (using dynamic import for ES modules)
+let updateUserStats;
+const initStatsModule = async () => {
+    try {
+        const statsModule = await import('../../backend/Utils/statsUtils.js');
+        updateUserStats = statsModule.updateUserStats;
+        console.log('✅ Stats utility imported successfully');
+    } catch (error) {
+        console.warn('⚠️  Could not import stats utility:', error.message);
+        console.warn('Stats updates will be disabled');
+    }
+};
+
+// Initialize the stats module
+initStatsModule();
+
 // Mongoose connection - only connect if MONGODB_URL is provided
 let MONGO_URI = process.env.MONGODB_URL;
 if (MONGO_URI) {
@@ -30,15 +46,6 @@ const ProblemSchema = new mongoose.Schema({
     difficulty: String,
     testCases: Array,
     hiddenTestcases: Array
-});
-
-const TestCaseSchema = new mongoose.Schema({
-    problemId: mongoose.Schema.Types.ObjectId,
-    input: String,
-    expectedOutput: String,
-    isHidden: Boolean,
-    timeLimit: Number,
-    memoryLimit: Number
 });
 
 const SubmissionSchema = new mongoose.Schema({
@@ -102,7 +109,6 @@ const SubmissionSchema = new mongoose.Schema({
 
 // Create models
 const Problem = mongoose.model('Problem', ProblemSchema);
-const TestCase = mongoose.model('TestCase', TestCaseSchema);
 const Submission = mongoose.model('Submission', SubmissionSchema);
 
 // Endpoint to submit a solution for judging
@@ -196,6 +202,15 @@ router.post('/submit/:problemId', async (req, res) => {
         });
 
         await submission.save();
+
+        // Update user stats if submission was successful
+        if (allTestsPassed && updateUserStats) {
+            try {
+                await updateUserStats(userId || "anonymous", problem.title);
+            } catch (error) {
+                console.warn('Failed to update user stats:', error.message);
+            }
+        }
 
         res.json({
             success: true,

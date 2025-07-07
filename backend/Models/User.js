@@ -46,10 +46,34 @@ const UserSchema = new Schema({
         enum: ['user', 'admin'],
         default: 'user'
     },
-    // Array of solved problems with details
-    solvedProblems: {
-        type: [solvedSchema], // Array of solved problems
-        default: [] // Default to empty array if no problems solved
+    
+    // Array of solved problems with their details
+    solvedProblems: [solvedSchema],
+    
+    // Total coding score - calculated from solved problems
+    totalCodingScore: {
+        type: Number,
+        default: 0
+    },
+    
+    // Statistics for leaderboard
+    stats: {
+        totalSubmissions: {
+            type: Number,
+            default: 0
+        },
+        acceptedSubmissions: {
+            type: Number,
+            default: 0
+        },
+        problemsSolved: {
+            type: Number,
+            default: 0
+        },
+        rank: {
+            type: Number,
+            default: 0
+        }
     }
 }, {
     // Add timestamp fields for tracking when user was created/updated

@@ -81,5 +81,5 @@ const executePythonJudge = (filepath, inputData = '') => {
 };
 
 module.exports = {
-    executePythonNoCleanup: executePythonJudge
+    executePythonJudge
 };

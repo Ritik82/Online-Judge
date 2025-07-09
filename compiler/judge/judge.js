@@ -1,6 +1,6 @@
-const { executeCppNoCleanup } = require('./executeCpp');
-const { executeJavaNoCleanup } = require('./executeJava');
-const { executePythonNoCleanup } = require('./executePython');
+const { executeCppJudge } = require('./executeCpp');
+const { executeJavaJudge } = require('./executeJava');
+const { executePythonJudge } = require('./executePython');
 const { generateFile } = require('../online-compiler/generateFile');
 
 /**
@@ -35,11 +35,11 @@ const judgeSubmission = async (language, code, testCases) => {
         const startTime = Date.now();
         
         if (language === 'cpp') {
-          output = await executeCppNoCleanup(filePath, testCase.input);
+          output = await executeCppJudge(filePath, testCase.input);
         } else if (language === 'java') {
-          output = await executeJavaNoCleanup(filePath, testCase.input);
+          output = await executeJavaJudge(filePath, testCase.input);
         } else if (language === 'python') {
-          output = await executePythonNoCleanup(filePath, testCase.input);
+          output = await executePythonJudge(filePath, testCase.input);
         }
         
         const executionTime = Date.now() - startTime;

@@ -165,5 +165,5 @@ const executeJavaJudge = (filepath, inputData = '') => {
 };
 
 module.exports = {
-    executeJavaNoCleanup: executeJavaJudge,
+    executeJavaJudge,
 };

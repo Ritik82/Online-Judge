@@ -34,7 +34,7 @@ const executeCppJudge = (filepath, inputData = '') => {
 
         const jobID = uuid();
         const inputFilePath = path.join(inputPath, `${jobID}.txt`);
-        const outPath = path.join(outputPath, `${jobID}.exe`);
+        const outPath = path.join(outputPath, process.platform === 'win32' ? `${jobID}.exe` : jobID);
 
         // Write input data to file
         try {
@@ -48,7 +48,7 @@ const executeCppJudge = (filepath, inputData = '') => {
         
         exec(compileCommand, {
             timeout: 15000,
-            windowsHide: true
+            ...(process.platform === 'win32' && { windowsHide: true })
         }, (compileError, compileStdout, compileStderr) => {
             if (compileError) {
                 // Clean up input file only
@@ -76,7 +76,7 @@ const executeCppJudge = (filepath, inputData = '') => {
                 timeout: 10000,
                 maxBuffer: 1024 * 1024, // 1MB buffer
                 killSignal: 'SIGTERM',
-                windowsHide: true
+                ...(process.platform === 'win32' && { windowsHide: true })
             }, (execError, execStdout, execStderr) => {
                 // Clean up temporary files but NOT the source file
                 const filesToCleanup = [inputFilePath, outPath];
@@ -113,5 +113,5 @@ const executeCppJudge = (filepath, inputData = '') => {
 };
 
 module.exports = {
-    executeCppNoCleanup: executeCppJudge,
+    executeCppJudge,
 };

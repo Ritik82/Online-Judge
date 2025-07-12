@@ -1,27 +1,32 @@
 # Use the Node.js 24 Alpine image as the base image
 FROM node:24-alpine
+ARG MONGODB_URL
+# Set environment variables
+ENV NODE_ENV=production \
+    PORT=8000 \
+    MONGODB_URL=${MONGODB_URL}
+
 # Set the working directory inside the container
 WORKDIR /app
-# Install required compilers and tools
-RUN apk update && apk add --no-cache g++ gcc openjdk11 python3  \
-    && rm -rf /var/cache/apk/*
 
-# Copy only the package.json and package-lock.json files and install dependencies.
-# This allows Docker to cache this layer when package files don't change.
+# Install compilers and tools (needed at runtime for code execution)
+RUN apk update && apk add --no-cache g++ openjdk11 python3 \
+    && rm -rf /usr/share/man /usr/share/doc /usr/share/info /var/cache/apk/*
+
+# Copy only package files and install production dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm ci --only=production && npm cache clean --force
 
 # Create necessary directories for code execution
 RUN mkdir -p /app/judge/inputs /app/judge/outputs \
     /app/online-compiler/codes /app/online-compiler/inputs /app/online-compiler/outputs
 
-# Set proper permissions for code execution directories
+# Set permissions
 RUN chmod 755 /app/judge/inputs /app/judge/outputs \
     /app/online-compiler/codes /app/online-compiler/inputs /app/online-compiler/outputs
 
 # Copy application code
 COPY . .
-
 
 # Expose port
 EXPOSE 8000

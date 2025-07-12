@@ -78,23 +78,6 @@ function Profile() {
     }
   };
 
-  const fetchDebugData = async () => {
-    try {
-      const apiUrl = import.meta.env.VITE_API_URL;
-      const response = await fetch(`${apiUrl}/api/debug/${username}`);
-      const data = await response.json();
-      
-      if (data.success) {
-        setDebugData(data.debug);
-        console.log('Debug data:', data.debug);
-      } else {
-        console.error('Debug fetch failed:', data.message);
-      }
-    } catch (err) {
-      console.error('Debug fetch error:', err);
-    }
-  };
-
   const handleFilterChange = (filterType, value) => {
     setFilters(prev => ({
       ...prev,
@@ -342,6 +325,9 @@ function Profile() {
                             Problem
                           </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                            Difficulty
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                             Status
                           </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
@@ -359,6 +345,11 @@ function Profile() {
                               <div className="text-white font-medium">{submission.title}</div>
                             </td>
                             <td className="px-4 py-4 whitespace-nowrap">
+                              <span className={`px-2 py-1 rounded text-xs border ${getDifficultyColor(submission.problemId?.difficulty)}`}>
+                                {submission.problemId?.difficulty || 'Unknown'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap">
                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(submission.status.success)}`}>
                                 {submission.status.success ? 'Accepted' : 'Wrong Answer'}
                               </span>
@@ -367,7 +358,7 @@ function Profile() {
                               {getLanguageDisplay(submission.lang)}
                             </td>
                             <td className="px-4 py-4 whitespace-nowrap text-gray-400 text-sm">
-                              {formatDateTime(submission.timestamp)}
+                              {formatDate(submission.timestamp)}
                             </td>
                           </tr>
                         ))}

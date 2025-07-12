@@ -58,7 +58,7 @@ function Dashboard() {
             </p>
             
             {/* Grid with cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mt-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
               <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-blue-500 transition duration-200">
                 <div className="flex flex-col h-full">
                   <div className="mb-4">
@@ -77,24 +77,6 @@ function Dashboard() {
                 </div>
               </div>
               
-              <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-yellow-500 transition duration-200">
-                <div className="flex flex-col h-full">
-                  <div className="mb-4">
-                    <svg className="w-12 h-12 text-yellow-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-4">Leaderboard</h3>
-                  <p className="text-gray-400 mb-6 flex-1">See how you rank among other competitive programmers</p>
-                  <Link
-                    to="/leaderboard"
-                    className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition duration-200 inline-block text-center w-full"
-                  >
-                    View Rankings
-                  </Link>
-                </div>
-              </div>
-              
               <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-green-500 transition duration-200">
                 <div className="flex flex-col h-full">
                   <div className="mb-4">
@@ -102,15 +84,14 @@ function Dashboard() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-4">Contests</h3>
-                  <p className="text-gray-400 mb-6 flex-1">Participate in programming contests and compete with others</p>
-                  <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-200 w-full">
-                    Join Contest
-                  </button>
+                  <h3 className="text-xl font-semibold text-white mb-4">Leaderboard</h3>
+                  <p className="text-gray-400 mb-6 flex-1">See how you rank among other competitive programmers</p>
+                  <Link to="/leaderboard" className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-200 w-full">
+                    View Rankings
+                  </Link>
                 </div>
               </div>
 
-              {/* COMPILER CARD */}
               <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 hover:border-orange-500 transition duration-200">
                 <div className="flex flex-col h-full">
                   <div className="mb-4">
@@ -147,11 +128,11 @@ function Dashboard() {
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
-      
-      {/* Footer - Now properly positioned */}
+      {/* Footer */}
       <footer className="bg-gray-800 border-t border-gray-700 flex-shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center">

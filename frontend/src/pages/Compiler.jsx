@@ -62,10 +62,9 @@ function Compiler() {
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
-    
     // Configure editor options
     editor.updateOptions({
-      minimap: { enabled: true },
+      minimap: { enabled: false },
       scrollBeyondLastLine: false,
       automaticLayout: true,
       bracketPairColorization: { enabled: true },

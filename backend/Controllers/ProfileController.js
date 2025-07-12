@@ -105,8 +105,9 @@ export const getUserSubmissions = async (req, res) => {
         // Calculate pagination
         const skip = (parseInt(page) - 1) * parseInt(limit);
         
-        // Get submissions with pagination
+        // Get submissions with pagination and populate problem data
         const submissions = await Submission.find(query)
+            .populate('problemId', 'difficulty codingScore tags')
             .sort({ timestamp: -1 })
             .limit(parseInt(limit))
             .skip(skip);

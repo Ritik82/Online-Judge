@@ -5,6 +5,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { FaCopy, FaCheck, FaSpinner, FaSun, FaMoon, FaSync, FaPlayCircle, FaPaperPlane, FaTerminal } from 'react-icons/fa';
+import ReactMarkdown from 'react-markdown';
 
 
 
@@ -54,6 +55,12 @@ function ProblemSolving() {
   const [showConsole, setShowConsole] = useState(true);
   const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 1000);
   const [copyStatus, setCopyStatus] = useState({ input: false, output: false });
+  
+  // AI Help states
+  const [aiResponse, setAiResponse] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiFeature, setAiFeature] = useState('hints');
+  const [hasAttemptedSubmission, setHasAttemptedSubmission] = useState(false);
   
   const editorRef = useRef(null);
   const navigate = useNavigate();
@@ -281,6 +288,7 @@ function ProblemSolving() {
     setSubmissionResult(null);
     setShowConsole(true);
     setConsoleTab('verdict');
+    setHasAttemptedSubmission(true); // Mark that user has attempted a submission
     
     // Show loading spinner in verdict section
     const loadingVerdict = (
@@ -433,6 +441,120 @@ function ProblemSolving() {
     }
   };
 
+  // AI Helper Functions
+  const handleAiRequest = async (feature) => {
+    if (!problem) {
+      toast.error('Please wait for the problem to load');
+      return;
+    }
+
+    setAiLoading(true);
+    setAiFeature(feature);
+    
+    let prompt = '';
+    
+    switch (feature) {
+      case 'hints':
+        prompt = `Give ONE helpful hint for solving this coding problem. Don't give multiple hints at once, just provide one progressive hint that guides the user in the right direction without revealing the complete solution.
+
+Problem: ${problem.title}
+Description: ${problem.description}
+Input Format: ${problem.inputFormat}
+Output Format: ${problem.outputFormat}
+Constraints: ${problem.constraints}
+Sample Input: ${problem.sampleInput}
+Sample Output: ${problem.sampleOutput}
+
+Provide just ONE hint that helps the user think through the problem.`;
+        break;
+        
+      case 'feedback':
+        if (!code.trim() || code === languageTemplates[language]) {
+          toast.error('Please write some code first to get feedback');
+          setAiLoading(false);
+          return;
+        }
+        prompt = `Review this code and provide only constructive feedback on how to improve it. Do not provide any code or lengthy summaries, just focus on specific areas for improvement.
+
+Problem: ${problem.title}
+User's Code (${language}):
+${code}
+
+Focus your review on:
+1. Logic issues and potential bugs
+2. Efficiency improvements 
+3. Code quality and readability issues
+4. Better approaches or optimizations
+
+Give concise, actionable feedback only.`;
+        break;
+        
+      case 'explanation':
+        if (!hasAttemptedSubmission) {
+          toast.error('Solution explanation is only available after you have attempted to submit your solution');
+          setAiLoading(false);
+          return;
+        }
+        prompt = `The user has submitted code and is stuck. Explain the solution approach in simple terms without showing any code.
+
+Problem: ${problem.title}
+Description: ${problem.description}
+Input Format: ${problem.inputFormat}
+Output Format: ${problem.outputFormat}
+Sample Input: ${problem.sampleInput}
+Sample Output: ${problem.sampleOutput}
+
+Explain only:
+1. The key insight needed to solve this problem
+2. The general approach/algorithm 
+3. Why this approach works
+
+Keep it simple and conceptual. No code examples.`;
+        break;
+        
+      case 'simplify':
+        prompt = `Break down this problem into simple, easy-to-understand terms. Focus on the core concept.
+
+Problem: ${problem.title}
+Description: ${problem.description}
+Input Format: ${problem.inputFormat}
+Output Format: ${problem.outputFormat}
+
+Provide:
+1. What the problem is asking in simple words
+2. The main concept or pattern involved
+3. A simple analogy or example if helpful
+4. The key steps to think about
+
+Make it beginner-friendly and clear.`;
+        break;
+        
+      default:
+        setAiLoading(false);
+        return;
+    }
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const response = await axios.post(`${apiUrl}/ai/ai-review`, {
+        prompt: prompt
+      });
+      
+      setAiResponse(response.data.result);
+    } catch (error) {
+      console.error('AI request error:', error);
+      toast.error('Failed to get AI response. Please try again.');
+      setAiResponse('Sorry, I encountered an error. Please try again.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const copyAiResponse = () => {
+    navigator.clipboard.writeText(aiResponse);
+    toast.success('AI response copied to clipboard');
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -515,11 +637,136 @@ function ProblemSolving() {
                 >
                   Submissions
                 </button>
+                <button
+                  onClick={() => setActiveTab('aihelp')}
+                  className={`px-4 py-2 rounded-t-md text-sm font-medium ${
+                    activeTab === 'aihelp' 
+                      ? 'bg-gray-900 text-white' 
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+                >
+                  AI Help
+                </button>
               </div>
             </div>
             
             <div className="flex-1 overflow-auto bg-gray-900 p-4">
-              {/* Problem content will be filled in later */}
+              {activeTab === 'aihelp' ? (
+                <div className="text-gray-300 h-full">
+                  <div className="flex flex-col h-full">
+                    {/* AI Feature Selection */}
+                    <div className="mb-4">
+                      <h2 className="text-lg font-bold mb-3 text-blue-400">AI Help</h2>
+                      <div className="grid grid-cols-1 gap-2 mb-4">
+                        <button
+                          onClick={() => handleAiRequest('hints')}
+                          disabled={aiLoading}
+                          className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:opacity-50 text-white px-3 py-2 rounded text-sm font-medium transition duration-200 flex items-center justify-center"
+                        >
+                          {aiLoading && aiFeature === 'hints' ? <FaSpinner className="animate-spin mr-1" /> : '💡'} Smart Hints
+                        </button>
+                        <button
+                          onClick={() => handleAiRequest('feedback')}
+                          disabled={aiLoading || !code.trim()}
+                          className="bg-green-600 hover:bg-green-700 disabled:bg-green-800 disabled:opacity-50 text-white px-3 py-2 rounded text-sm font-medium transition duration-200 flex items-center justify-center"
+                        >
+                          {aiLoading && aiFeature === 'feedback' ? <FaSpinner className="animate-spin mr-1" /> : '📝'} Code Review
+                        </button>
+                        <button
+                          onClick={() => handleAiRequest('explanation')}
+                          disabled={aiLoading || !hasAttemptedSubmission}
+                          className="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:opacity-50 text-white px-3 py-2 rounded text-sm font-medium transition duration-200 flex items-center justify-center"
+                        >
+                          {aiLoading && aiFeature === 'explanation' ? <FaSpinner className="animate-spin mr-1" /> : '📚'} Explanation
+                        </button>
+                        <button
+                          onClick={() => handleAiRequest('simplify')}
+                          disabled={aiLoading}
+                          className="bg-teal-600 hover:bg-teal-700 disabled:bg-teal-800 disabled:opacity-50 text-white px-3 py-2 rounded text-sm font-medium transition duration-200 flex items-center justify-center"
+                        >
+                          {aiLoading && aiFeature === 'simplify' ? <FaSpinner className="animate-spin mr-1" /> : '🎯'} Simplify
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* AI Response Area */}
+                    <div className="flex-1 flex flex-col min-h-0">
+                      <div className="flex justify-between items-center mb-2">
+                        <h3 className="text-md font-semibold text-gray-400">
+                          {aiLoading ? 'AI is thinking...' : aiResponse ? 'AI Response:' : 'Select an option to get started'}
+                        </h3>
+                        {aiResponse && !aiLoading && (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={copyAiResponse}
+                              className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-xs font-medium transition duration-200 flex items-center"
+                            >
+                              <FaCopy className="mr-1" /> Copy
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex-1 bg-gray-800 rounded p-4 overflow-y-auto border border-gray-700 min-h-[200px]">
+                        {aiLoading ? (
+                          <div className="flex items-center justify-center h-32">
+                            <FaSpinner className="animate-spin text-3xl text-blue-500 mr-3" />
+                            <span className="text-lg">AI is processing your request...</span>
+                          </div>
+                        ) : aiResponse ? (
+                          <div className="text-sm text-gray-100 leading-relaxed">
+                            <ReactMarkdown
+                              components={{
+                                h1: ({node, ...props}) => <h1 className="text-xl font-bold text-blue-400 mb-4 mt-6 border-b border-gray-600 pb-2" {...props} />,
+                                h2: ({node, ...props}) => <h2 className="text-lg font-bold text-blue-300 mb-3 mt-5" {...props} />,
+                                h3: ({node, ...props}) => <h3 className="text-md font-bold text-white mb-3 mt-4" {...props} />,
+                                h4: ({node, ...props}) => <h4 className="text-sm font-bold text-gray-200 mb-2 mt-3" {...props} />,
+                                p: ({node, ...props}) => <p className="mb-4 text-gray-200 leading-7 text-sm" {...props} />,
+                                strong: ({node, ...props}) => <strong className="font-bold text-yellow-300" {...props} />,
+                                em: ({node, ...props}) => <em className="italic text-blue-300" {...props} />,
+                                ul: ({node, ...props}) => <ul className="list-none mb-4 space-y-2" {...props} />,
+                                ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-4 ml-4 space-y-2 text-gray-200" {...props} />,
+                                li: ({node, ...props}) => (
+                                  <li className="mb-2 text-gray-200 flex items-start" {...props}>
+                                    <span className="text-blue-400 mr-2 flex-shrink-0">•</span>
+                                    <span className="flex-1">{props.children}</span>
+                                  </li>
+                                ),
+                                code: ({node, inline, ...props}) => 
+                                  inline ? (
+                                    <code className="font-bold text-cyan-300" style={{backgroundColor: 'transparent', padding: 0, margin: 0}} {...props} />
+                                  ) : (
+                                    <code className="block bg-gray-800 text-green-300 p-4 rounded-lg text-sm font-mono whitespace-pre-wrap my-3 border border-gray-600" {...props} />
+                                  ),
+                                pre: ({node, ...props}) => (
+                                  <pre className="bg-gray-800 rounded-lg p-4 overflow-x-auto mb-4 text-sm border border-gray-600" {...props} />
+                                ),
+                                blockquote: ({node, ...props}) => (
+                                  <blockquote className="border-l-4 border-blue-500 pl-4 my-4 bg-gray-800 bg-opacity-50 py-3 rounded-r italic text-gray-300" {...props} />
+                                ),
+                              }}
+                            >
+                              {aiResponse}
+                            </ReactMarkdown>
+                          </div>
+                        ) : (
+                          <div className="text-center text-gray-500 h-32 flex items-center justify-center">
+                            <div>
+                              <div className="text-4xl mb-2">🤖</div>
+                              <p>Choose an AI feature to get intelligent assistance with this problem</p>
+                              <p className="text-xs mt-2">Hints • Code Review • Solution Explanation • Problem Simplification</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  {/* Other tab content would go here */}
+                </div>
+              )}
             </div>
           </div>
           
@@ -568,13 +815,135 @@ function ProblemSolving() {
                       >
                         Submissions
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('aihelp')}
+                        className={`px-4 py-2 rounded-t-md text-sm font-medium ${
+                          activeTab === 'aihelp' 
+                            ? 'bg-gray-900 text-white' 
+                            : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        }`}
+                      >
+                        AI Help
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
               
               <div className="flex-1 overflow-auto bg-gray-900 p-4">
-                {activeTab === 'description' ? (
+                {activeTab === 'aihelp' ? (
+                  <div className="text-gray-300 h-full">
+                    <div className="flex flex-col h-full">
+                      {/* AI Feature Selection */}
+                      <div className="mb-4">
+                        <h2 className="text-lg font-bold mb-3 text-blue-400">AI Help</h2>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
+                          <button
+                            onClick={() => handleAiRequest('hints')}
+                            disabled={aiLoading}
+                            className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:opacity-50 text-white px-3 py-2 rounded text-sm font-medium transition duration-200 flex items-center justify-center"
+                          >
+                            {aiLoading && aiFeature === 'hints' ? <FaSpinner className="animate-spin mr-1" /> : '💡'} Smart Hints
+                          </button>
+                          <button
+                            onClick={() => handleAiRequest('feedback')}
+                            disabled={aiLoading || !code.trim()}
+                            className="bg-green-600 hover:bg-green-700 disabled:bg-green-800 disabled:opacity-50 text-white px-3 py-2 rounded text-sm font-medium transition duration-200 flex items-center justify-center"
+                          >
+                            {aiLoading && aiFeature === 'feedback' ? <FaSpinner className="animate-spin mr-1" /> : '📝'} Code Review
+                          </button>
+                          <button
+                            onClick={() => handleAiRequest('explanation')}
+                            disabled={aiLoading || !hasAttemptedSubmission}
+                            className="bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:opacity-50 text-white px-3 py-2 rounded text-sm font-medium transition duration-200 flex items-center justify-center"
+                          >
+                            {aiLoading && aiFeature === 'explanation' ? <FaSpinner className="animate-spin mr-1" /> : '📚'} Explanation
+                          </button>
+                          <button
+                            onClick={() => handleAiRequest('simplify')}
+                            disabled={aiLoading}
+                            className="bg-teal-600 hover:bg-teal-700 disabled:bg-teal-800 disabled:opacity-50 text-white px-3 py-2 rounded text-sm font-medium transition duration-200 flex items-center justify-center"
+                          >
+                            {aiLoading && aiFeature === 'simplify' ? <FaSpinner className="animate-spin mr-1" /> : '🎯'} Simplify
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* AI Response Area */}
+                      <div className="flex-1 flex flex-col min-h-0">
+                        <div className="flex justify-between items-center mb-2">
+                          <h3 className="text-md font-semibold text-gray-400">
+                            {aiLoading ? 'AI is thinking...' : aiResponse ? 'AI Response:' : 'Select an option above to get started'}
+                          </h3>
+                          {aiResponse && !aiLoading && (
+                            <div className="flex gap-2">
+                              <button
+                                onClick={copyAiResponse}
+                                className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-xs font-medium transition duration-200 flex items-center"
+                              >
+                                <FaCopy className="mr-1" /> Copy
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex-1 bg-gray-800 rounded p-4 overflow-y-auto border border-gray-700">
+                          {aiLoading ? (
+                            <div className="flex items-center justify-center h-32">
+                              <FaSpinner className="animate-spin text-3xl text-blue-500 mr-3" />
+                              <span className="text-lg">AI is processing your request...</span>
+                            </div>
+                          ) : aiResponse ? (
+                            <div className="text-sm text-gray-100 leading-relaxed">
+                              <ReactMarkdown
+                                components={{
+                                  h1: ({node, ...props}) => <h1 className="text-xl font-bold text-blue-400 mb-4 mt-6 border-b border-gray-600 pb-2" {...props} />,
+                                  h2: ({node, ...props}) => <h2 className="text-lg font-bold text-blue-300 mb-3 mt-5" {...props} />,
+                                  h3: ({node, ...props}) => <h3 className="text-md font-bold text-white mb-3 mt-4" {...props} />,
+                                  h4: ({node, ...props}) => <h4 className="text-sm font-bold text-gray-200 mb-2 mt-3" {...props} />,
+                                  p: ({node, ...props}) => <p className="mb-4 text-gray-200 leading-7 text-sm" {...props} />,
+                                  strong: ({node, ...props}) => <strong className="font-bold text-yellow-300" {...props} />,
+                                  em: ({node, ...props}) => <em className="italic text-blue-300" {...props} />,
+                                  ul: ({node, ...props}) => <ul className="list-none mb-4 space-y-2" {...props} />,
+                                  ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-4 ml-4 space-y-2 text-gray-200" {...props} />,
+                                  li: ({node, ...props}) => (
+                                    <li className="mb-2 text-gray-200 flex items-start" {...props}>
+                                      <span className="text-blue-400 mr-2 flex-shrink-0">•</span>
+                                      <span className="flex-1">{props.children}</span>
+                                    </li>
+                                  ),
+                                  code: ({node, inline, ...props}) => 
+                                    inline ? (
+                                      <code className="font-bold text-cyan-300" style={{backgroundColor: 'transparent', padding: 0, margin: 0}} {...props} />
+                                    ) : (
+                                      <code className="block bg-gray-800 text-green-300 p-4 rounded-lg text-sm font-mono whitespace-pre-wrap my-3 border border-gray-600" {...props} />
+                                    ),
+                                  pre: ({node, ...props}) => (
+                                    <pre className="bg-gray-800 rounded-lg p-4 overflow-x-auto mb-4 text-sm border border-gray-600" {...props} />
+                                  ),
+                                  blockquote: ({node, ...props}) => (
+                                    <blockquote className="border-l-4 border-blue-500 pl-4 my-4 bg-gray-800 bg-opacity-50 py-3 rounded-r italic text-gray-300" {...props} />
+                                  ),
+                                }}
+                              >
+                                {aiResponse}
+                              </ReactMarkdown>
+                            </div>
+                          ) : (
+                            <div className="text-center text-gray-500 h-32 flex items-center justify-center">
+                              <div>
+                                <div className="text-4xl mb-2">🤖</div>
+                                <p>Choose an option to get intelligent assistance with this problem</p>
+                                <p className="text-xs mt-2">Hints • Code Review • Solution Explanation • Problem Simplification</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : activeTab === 'description' ? (
                   isProblemLoading ? (
                     <div className="flex justify-center p-10">
                       <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -647,7 +1016,7 @@ function ProblemSolving() {
                       
                       {problem?.explanation && (
                         <div className="mb-4">
-                          <h3 className="text-lg font-medium text-white">Explanation:</h3>
+                          <h3 className="text-lg font-medium text-white">Solution Explanation:</h3>
                           <p className="text-gray-300 whitespace-pre-wrap">{problem.explanation}</p>
                         </div>
                       )}

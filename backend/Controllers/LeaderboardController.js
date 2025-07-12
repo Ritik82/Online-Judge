@@ -57,7 +57,6 @@ const calculateAndUpdateUserStats = async (userId) => {
 // Helper function to recalculate and update all user rankings
 const updateAllUserRankings = async () => {
     try {
-        console.log('🔄 Updating user rankings...');
         
         // Get all users sorted by ranking criteria
         const users = await UserModel.find({ role: 'user' })
@@ -82,8 +81,6 @@ const updateAllUserRankings = async () => {
         });
 
         await Promise.all(updatePromises);
-        console.log(`✅ Updated rankings for ${users.length} users`);
-        
         return users.length;
     } catch (error) {
         console.error('Error updating rankings:', error);
@@ -105,7 +102,6 @@ const getLeaderboard = async (req, res) => {
 
         // If refresh is requested, update all user stats and rankings
         if (refresh === 'true') {
-            console.log('🔄 Refresh requested - updating all user stats...');
             
             // Get all users that match search filter
             const usersToUpdate = await UserModel.find(searchFilter);
@@ -121,8 +117,6 @@ const getLeaderboard = async (req, res) => {
             
             // Update all user rankings after stats are updated
             await updateAllUserRankings();
-            
-            console.log('✅ Refresh completed');
         }
 
         // Get users with updated stats (use pre-calculated data for performance)
@@ -205,7 +199,6 @@ const getUserRank = async (req, res) => {
 
         // If refresh is requested, update this user's stats
         if (refresh === 'true') {
-            console.log(`🔄 Updating stats for user: ${username}`);
             await calculateAndUpdateUserStats(user._id);
             // Also update rankings to get accurate rank
             await updateAllUserRankings();
@@ -275,7 +268,6 @@ const getLeaderboardStats = async (req, res) => {
         
         // If refresh is requested, update all user stats first
         if (refresh === 'true') {
-            console.log('🔄 Refreshing leaderboard statistics...');
             
             // Update all user stats
             const allUsers = await UserModel.find({ role: 'user' });
@@ -357,7 +349,6 @@ const getLeaderboardStats = async (req, res) => {
 // New endpoint: Force refresh all user stats and rankings
 const refreshLeaderboard = async (req, res) => {
     try {
-        console.log('🔄 Force refreshing entire leaderboard...');
         
         const allUsers = await UserModel.find({ role: 'user' });
         let updatedCount = 0;
@@ -374,8 +365,6 @@ const refreshLeaderboard = async (req, res) => {
         
         // Update all rankings
         const totalRanked = await updateAllUserRankings();
-        
-        console.log('✅ Force refresh completed');
         
         res.status(200).json({
             success: true,

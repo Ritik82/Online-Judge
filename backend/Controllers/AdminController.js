@@ -150,10 +150,27 @@ const createProblem = async (req, res) => {
             });
         }
 
+        // Set coding score based on difficulty
+        let codingScore;
+        switch (difficulty.toLowerCase()) {
+            case 'easy':
+                codingScore = 1;
+                break;
+            case 'medium':
+                codingScore = 2;
+                break;
+            case 'hard':
+                codingScore = 4;
+                break;
+            default:
+                codingScore = 1; // Default to easy if difficulty is not recognized
+                break;
+        }
+
         const problem = await Problem.create({
             title,
             difficulty,
-            codingScore: 100, // Default score
+            codingScore,
             tags: tags || [],
             description,
             inputFormat: inputFormat || "Standard input format",

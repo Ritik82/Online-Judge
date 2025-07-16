@@ -252,7 +252,7 @@ function Compiler() {
     };
 
     try {
-      const compilerUrl = import.meta.env.VITE_COMPILER_URL ;
+      const compilerUrl = `${import.meta.env.VITE_COMPILER_URL}/compiler/run`;
       const { data } = await axios.post(compilerUrl, payload);
       setOutput(data.output || 'No output');
       // Toast notification removed

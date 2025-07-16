@@ -308,10 +308,7 @@ function ProblemSolving() {
 
     try {
       const userId = localStorage.getItem('loggedInUser');
-      const compilerUrl = import.meta.env.VITE_COMPILER_URL;
-      // Build the judge URL properly
-      const baseUrl = compilerUrl.replace('/api/compiler/run', '');
-      const judgeUrl = `${baseUrl}/api/judge/submit/${problemId}`;
+      const judgeUrl = `${import.meta.env.VITE_COMPILER_URL}/judge/submit/${problemId}`;
       
       const payload = {
         language,
@@ -428,11 +425,6 @@ function ProblemSolving() {
       }
     }
   }, [showConsole, consoleTab]);
-  
-  // Switch theme function
-  const switchTheme = () => {
-    setTheme((prevTheme) => (prevTheme === "vs-dark" ? "light" : "vs-dark"));
-  };
 
   // Reset code function
   const refreshCode = () => {

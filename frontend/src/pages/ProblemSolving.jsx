@@ -151,11 +151,8 @@ function ProblemSolving() {
   // Fetch submission history for this problem
   const fetchSubmissionHistory = async () => {
     try {
-      const compilerUrl = import.meta.env.VITE_COMPILER_URL;
       const userId = localStorage.getItem('loggedInUser');
-      // Build the judge URL properly
-      const baseUrl = compilerUrl.replace('/api/compiler/run', '');
-      const judgeUrl = `${baseUrl}/api/judge/submissions/${problemId}?userId=${userId}`;
+      const judgeUrl = `${import.meta.env.VITE_COMPILER_URL}/judge/submissions/${problemId}?userId=${userId}`;
       
       const { data } = await axios.get(judgeUrl);
       
@@ -232,7 +229,7 @@ function ProblemSolving() {
     };
 
     try {
-      const compilerUrl = import.meta.env.VITE_COMPILER_URL;
+      const compilerUrl = `${import.meta.env.VITE_COMPILER_URL}/compiler/run`;
       const { data } = await axios.post(compilerUrl, payload);
       
       setTestOutput(

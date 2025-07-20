@@ -13,6 +13,7 @@ function Leaderboard() {
   const [pagination, setPagination] = useState({});
   const [userRank, setUserRank] = useState(null);
   const [error, setError] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const currentUser = localStorage.getItem('loggedInUser');
@@ -35,7 +36,7 @@ function Leaderboard() {
     try {
       setLoading(true);
       setError('');
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = import.meta.env.VITE_API_URL;
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '50',
@@ -79,7 +80,7 @@ function Leaderboard() {
 
   const fetchStats = async (isRefresh = false) => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = import.meta.env.VITE_API_URL;
       const params = isRefresh ? '?refresh=true' : '';
       
       const response = await fetch(`${apiUrl}/leaderboard/stats${params}`, {
@@ -107,7 +108,7 @@ function Leaderboard() {
 
   const fetchUserRank = async (isRefresh = false) => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const apiUrl = import.meta.env.VITE_API_URL;
       const params = isRefresh ? '?refresh=true' : '';
       
       const response = await fetch(`${apiUrl}/leaderboard/rank/${currentUser}${params}`, {
@@ -164,12 +165,12 @@ function Leaderboard() {
     navigate('/');
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   const getRankIcon = (rank) => {
-    if (rank === 1) return <FaTrophy className="text-yellow-500 text-xl" />;
-    if (rank === 2) return <FaMedal className="text-gray-400 text-xl" />;
-    if (rank === 3) return <FaAward className="text-amber-600 text-xl" />;
-    if (rank <= 10) return <FaStar className="text-purple-500" />;
-    return <span className="text-gray-400 font-bold">#{rank}</span>;
+    return <span className="text-white font-bold text-lg">{rank}</span>;
   };
 
   const getRankColor = (rank) => {
@@ -177,7 +178,7 @@ function Leaderboard() {
     if (rank === 2) return 'bg-gradient-to-r from-gray-400 to-gray-500 shadow-lg shadow-gray-500/50';
     if (rank === 3) return 'bg-gradient-to-r from-amber-600 to-amber-700 shadow-lg shadow-amber-600/50';
     if (rank <= 10) return 'bg-gradient-to-r from-purple-600 to-purple-700 shadow-lg shadow-purple-600/50';
-    return 'bg-gray-800';
+    return 'bg-gray-700';
   };
 
   const getRankBadge = (rank) => {
@@ -192,10 +193,13 @@ function Leaderboard() {
       {/* Navigation */}
       <nav className="bg-gray-800 border-b border-gray-700 flex-shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-8">
-              <h1 className="text-xl font-bold text-white">Online Judge</h1>
-              <div className="space-x-4">
+          <div className="flex justify-between items-center h-[60px] sm:h-[50px]">
+            {/* Logo and Desktop Navigation */}
+            <div className="flex items-center">
+              <h1 className="text-xl font-bold text-white mr-8">Online Judge</h1>
+              
+              {/* Desktop Navigation Links */}
+              <div className="hidden md:flex items-center space-x-6">
                 <Link
                   to="/dashboard"
                   className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200"
@@ -209,14 +213,17 @@ function Leaderboard() {
                   Problems
                 </Link>
                 <Link
-                  to="/leaderboard"
-                  className="text-blue-400 px-3 py-2 rounded-md text-sm font-medium"
+                  to="/compiler"
+                  className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200"
                 >
-                  Leaderboard
+                  Compiler
                 </Link>
+                
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+
+            {/* Desktop User Menu */}
+            <div className="hidden md:flex items-center space-x-4">
               <span className="text-gray-300 text-sm">
                 Welcome,{" "}
                 <Link
@@ -234,25 +241,96 @@ function Leaderboard() {
                 Logout
               </button>
             </div>
+
+            {/* Mobile Hamburger Menu Button */}
+            <div className="md:hidden">
+              <button
+                onClick={toggleMobileMenu}
+                className="text-gray-300 hover:text-white focus:outline-none focus:text-white transition duration-200"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  {isMobileMenuOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
+            </div>
           </div>
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden border-t border-gray-700 py-4">
+              <div className="flex flex-col space-y-3">
+                <Link
+                  to="/dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200 text-left"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/problems"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200 text-left"
+                >
+                  Problems
+                </Link>
+                <Link
+                  to="/compiler"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200 text-left"
+                >
+                  Compiler
+                </Link>
+              
+                
+                {/* Mobile User Info */}
+                <div className="pt-3 border-t border-gray-700">
+                  <div className="text-gray-300 text-sm px-3 py-2">
+                    Welcome,{" "}
+                    <Link
+                      to={`/profile/${currentUser}`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-blue-400 hover:text-blue-300 transition duration-200"
+                    >
+                      {currentUser}
+                    </Link>
+                    !
+                  </div>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm transition duration-200 mt-2 mx-3"
+                    style={{ width: 'calc(100% - 1.5rem)' }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
       {/* Main Content */}
-      <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-white mb-2">
-                <FaTrophy className="inline mr-3 text-yellow-500" />
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                <FaTrophy className="inline mr-2 sm:mr-3 text-yellow-500" />
                 Leaderboard
               </h1>
             </div>
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="flex items-center bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition duration-200 shadow-lg"
+              className="flex items-center justify-center bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition duration-200 shadow-lg text-sm sm:text-base"
               title={refreshing ? 'Updating all user stats and rankings...' : 'Refresh leaderboard with latest data'}
             >
               <FaSync className={`mr-2 ${refreshing ? 'animate-spin' : ''}`} />
@@ -295,25 +373,25 @@ function Leaderboard() {
       )}
         {/* User Rank Card */}
         {userRank && (
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 mb-8 border-2 border-blue-500">
-            <div className="flex items-center justify-between">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8 border-2 border-blue-500">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center">
-                <div className="text-4xl mr-4">
+                <div className="text-3xl sm:text-4xl mr-3 sm:mr-4">
                   {getRankIcon(userRank.userRank)}
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white flex items-center">
+                  <h3 className="text-lg sm:text-xl font-bold text-white flex items-center">
                     Your Rank
                     {getRankBadge(userRank.userRank)}
                   </h3>
-                  <p className="text-blue-100">
+                  <p className="text-blue-100 text-sm sm:text-base">
                     #{userRank.userRank} out of {userRank.totalUsers} users
                   </p>
                 </div>
               </div>
               <Link
                 to={`/profile/${currentUser}`}
-                className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition duration-200"
+                className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition duration-200 text-center text-sm sm:text-base"
               >
                 View Profile
               </Link>
@@ -322,8 +400,8 @@ function Leaderboard() {
         )}
 
         {/* Search Bar */}
-        <div className="mb-6">
-          <form onSubmit={handleSearch} className="flex gap-4">
+        <div className="mb-4 sm:mb-6">
+          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="relative flex-1">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
@@ -331,33 +409,108 @@ function Leaderboard() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search users by name..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
               />
             </div>
-            <button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition duration-200"
-            >
-              Search
-            </button>
-            {searchQuery && (
+            <div className="flex gap-2 sm:gap-4">
               <button
-                type="button"
-                onClick={() => {
-                  setSearchQuery('');
-                  setCurrentPage(1);
-                  setTimeout(fetchLeaderboard, 100);
-                }}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition duration-200"
+                type="submit"
+                className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 rounded-lg transition duration-200 text-sm sm:text-base"
               >
-                Clear
+                Search
               </button>
-            )}
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setCurrentPage(1);
+                    setTimeout(fetchLeaderboard, 100);
+                  }}
+                  className="flex-1 sm:flex-none bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition duration-200 text-sm sm:text-base"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
           </form>
         </div>
 
-        {/* Leaderboard Table */}
-        <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+        {/* Leaderboard - Mobile Cards */}
+        <div className="block md:hidden space-y-3">
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <p className="mt-4 text-gray-400">Loading leaderboard...</p>
+            </div>
+          ) : leaderboardData.length === 0 ? (
+            <div className="text-center py-12 px-4">
+              <FaUsers className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-400 mb-2">No users found</h3>
+              <p className="text-gray-500">Try adjusting your search criteria.</p>
+            </div>
+          ) : (
+            leaderboardData.map((user, index) => (
+              <div
+                key={user._id}
+                className={`bg-gray-800 rounded-lg border border-gray-700 p-4 hover:border-blue-500 transition duration-200 ${
+                  user.name === currentUser ? 'ring-2 ring-blue-500 ring-opacity-50 bg-blue-900 bg-opacity-10' : ''
+                }`}
+              >
+                {/* Rank and User Info */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${getRankColor(user.rank)}`}>
+                      {getRankIcon(user.rank)}
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        {user.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <Link
+                          to={`/profile/${user.name}`}
+                          className="text-base font-semibold text-white hover:text-blue-400 transition duration-200"
+                        >
+                          {user.name}
+                        </Link>
+                        <div className="text-xs text-gray-400">{user.email}</div>
+                      </div>
+                    </div>
+                  </div>
+                  {user.name === currentUser && (
+                    <div className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                      You
+                    </div>
+                  )}
+                </div>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-gray-700 bg-opacity-50 rounded-lg p-3">
+                    <div className="text-xs text-gray-400 mb-1">Coding Score</div>
+                    <div className="text-lg font-bold text-yellow-500">{user.totalCodingScore}</div>
+                  </div>
+                  <div className="bg-gray-700 bg-opacity-50 rounded-lg p-3">
+                    <div className="text-xs text-gray-400 mb-1">Problems Solved</div>
+                    <div className="text-lg font-bold text-green-400">{user.problemsSolved}</div>
+                  </div>
+                  <div className="bg-gray-700 bg-opacity-50 rounded-lg p-3">
+                    <div className="text-xs text-gray-400 mb-1">Submissions</div>
+                    <div className="text-sm text-gray-300">{user.acceptedSubmissions} / {user.totalSubmissions}</div>
+                  </div>
+                  <div className="bg-gray-700 bg-opacity-50 rounded-lg p-3">
+                    <div className="text-xs text-gray-400 mb-1">Acceptance Rate</div>
+                    <div className="text-sm text-gray-300">{user.acceptanceRate}%</div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Leaderboard - Desktop Table */}
+        <div className="hidden md:block bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-700">
               <thead className="bg-gray-750">
@@ -380,15 +533,12 @@ function Leaderboard() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Acceptance Rate
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                    Joined
-                  </th>
                 </tr>
               </thead>
               <tbody className="bg-gray-800 divide-y divide-gray-700">
                 {loading ? (
                   <tr>
-                    <td colSpan="7" className="px-6 py-12 text-center">
+                    <td colSpan="6" className="px-6 py-12 text-center">
                       <div className="flex justify-center">
                         <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                       </div>
@@ -396,7 +546,7 @@ function Leaderboard() {
                   </tr>
                 ) : leaderboardData.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="px-6 py-12 text-center text-gray-400">
+                    <td colSpan="6" className="px-6 py-12 text-center text-gray-400">
                       No users found
                     </td>
                   </tr>
@@ -451,11 +601,6 @@ function Leaderboard() {
                           {user.acceptanceRate}%
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-400">
-                          {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}
-                        </div>
-                      </td>
                     </tr>
                   ))
                 )}
@@ -466,26 +611,28 @@ function Leaderboard() {
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-gray-400">
+          <div className="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
+            <div className="text-sm text-gray-400 text-center sm:text-left">
               Showing {((currentPage - 1) * 50) + 1} to {Math.min(currentPage * 50, pagination.totalUsers)} of {pagination.totalUsers} users
             </div>
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setCurrentPage(currentPage - 1)}
                 disabled={!pagination.hasPrev}
-                className="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
+                className="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 flex items-center"
               >
                 <FaChevronLeft className="w-4 h-4" />
+                <span className="hidden sm:inline ml-2">Previous</span>
               </button>
-              <span className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg">
-                {currentPage}
+              <span className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg">
+                {currentPage} of {pagination.totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage(currentPage + 1)}
                 disabled={!pagination.hasNext}
-                className="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200"
+                className="px-3 py-2 text-sm font-medium text-gray-400 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition duration-200 flex items-center"
               >
+                <span className="hidden sm:inline mr-2">Next</span>
                 <FaChevronRight className="w-4 h-4" />
               </button>
             </div>

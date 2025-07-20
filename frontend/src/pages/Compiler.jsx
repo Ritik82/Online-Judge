@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 //languageTemplates
@@ -34,6 +34,7 @@ function Compiler() {
   const [theme, setTheme] = useState('vs-dark');
   const [fontSize, setFontSize] = useState(14);
   const [wordWrap, setWordWrap] = useState('off');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const editorRef = useRef(null);
   const navigate = useNavigate();
 
@@ -276,24 +277,54 @@ function Compiler() {
     navigate('/');
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col">
       {/* Navigation */}
       <nav className="bg-gray-800 border-b border-gray-700 flex-shrink-0">
-        <div className="max-w-full mx-auto px-6 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-[50px]">
-            <div className="flex items-center space-x-8">
-              <h1 className="text-xl font-bold text-white">Online Judge</h1>
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200"
-              >
-                Dashboard
-              </button>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-[60px] sm:h-[50px]">
+            {/* Logo and Desktop Navigation */}
+            <div className="flex items-center">
+              <h1 className="text-xl font-bold text-white mr-8">Online Judge</h1>
+              
+              {/* Desktop Navigation Links */}
+              <div className="hidden md:flex items-center space-x-6">
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200"
+                >
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => navigate('/problems')}
+                  className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200"
+                >
+                  Problems
+                </button>
+                <button
+                  onClick={() => navigate('/leaderboard')}
+                  className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200"
+                >
+                  Leaderboard
+                </button>
+              </div>
             </div>
-            <div className="flex items-center space-x-4">
+
+            {/* Desktop User Menu */}
+            <div className="hidden md:flex items-center space-x-4">
               <span className="text-gray-300 text-sm">
-                Welcome, {localStorage.getItem('loggedInUser')}!
+                Welcome,{" "}
+                <Link
+                  to={`/profile/${localStorage.getItem('loggedInUser')}`}
+                  className="text-blue-400 hover:text-blue-300 transition duration-200 font-medium cursor-pointer"
+                >
+                  {localStorage.getItem('loggedInUser')}
+                </Link>
+                !
               </span>
               <button
                 onClick={handleLogout}
@@ -302,14 +333,90 @@ function Compiler() {
                 Logout
               </button>
             </div>
+
+            {/* Mobile Hamburger Menu Button */}
+            <div className="md:hidden">
+              <button
+                onClick={toggleMobileMenu}
+                className="text-gray-300 hover:text-white focus:outline-none focus:text-white transition duration-200"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  {isMobileMenuOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
+            </div>
           </div>
+
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden border-t border-gray-700 py-4">
+              <div className="flex flex-col space-y-3">
+                <button
+                  onClick={() => {
+                    navigate('/dashboard');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200 text-left"
+                >
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => {
+                    navigate('/problems');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200 text-left"
+                >
+                  Problems
+                </button>
+                <button
+                  onClick={() => {
+                    navigate('/leaderboard');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200 text-left"
+                >
+                  Leaderboard
+                </button>
+                
+                {/* Mobile User Info */}
+                <div className="pt-3 border-t border-gray-700">
+                  <div className="text-gray-300 text-sm px-3 py-2">
+                    Welcome,{" "}
+                    <Link
+                      to={`/profile/${localStorage.getItem('loggedInUser')}`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="text-blue-400 hover:text-blue-300 transition duration-200 font-medium"
+                    >
+                      {localStorage.getItem('loggedInUser')}
+                    </Link>
+                    !
+                  </div>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full text-left bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm transition duration-200 mt-2 mx-3"
+                    style={{ width: 'calc(100% - 1.5rem)' }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
       {/* Header Section */}
       <div className="bg-gray-800 border-b border-gray-700 flex-shrink-0">
-        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-1">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-1">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
             {/* Language Selector & Run Button */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className="flex items-center gap-2">
@@ -344,8 +451,8 @@ function Compiler() {
             </div>
 
             {/* Editor Settings */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 overflow-x-auto">
+              <div className="flex items-center gap-2 whitespace-nowrap">
                 <label className="text-sm text-gray-300">Theme:</label>
                 <select
                   value={theme}
@@ -358,7 +465,7 @@ function Compiler() {
                 </select>
               </div>
               
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 whitespace-nowrap">
                 <label className="text-sm text-gray-300">Font Size:</label>
                 <select
                   value={fontSize}
@@ -380,9 +487,9 @@ function Compiler() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col lg:flex-row min-h-0">
         {/* Code Editor Section */}
-        <div className="flex-1 flex flex-col min-h-0 border-r border-gray-700 relative">
-          {/* Left border */}
-          <div className="absolute left-0 top-0 bottom-0 w-3 bg-gray-800 z-10"></div>
+        <div className="flex-1 flex flex-col min-h-0 lg:border-r border-gray-700 relative">
+          {/* Left border - hidden on mobile */}
+          <div className="absolute left-0 top-0 bottom-0 w-3 bg-gray-800 z-10 hidden lg:block"></div>
           
           <div className="bg-gray-800 px-4 py-2 border-b border-gray-700 flex-shrink-0">
             <div className="flex items-center justify-between">
@@ -392,7 +499,7 @@ function Compiler() {
                 </svg>
                 Source Code
               </h3>
-              <div className="flex items-center gap-4 text-xs text-gray-400">
+              <div className="hidden sm:flex items-center gap-4 text-xs text-gray-400">
                 <span>Lines: {code.split('\n').length}</span>
                 <span>Characters: {code.length}</span>
                 <span>Ctrl+Enter to run</span>
@@ -401,7 +508,7 @@ function Compiler() {
           </div>
           
           {/* Monaco Editor */}
-          <div className="flex-1">
+          <div className="flex-1" style={{ minHeight: '300px' }}>
             <Editor
               height="100%"
               language={getMonacoLanguage()}
@@ -452,9 +559,9 @@ function Compiler() {
         </div>
 
         {/* Input/Output Section */}
-        <div className="w-full lg:w-96 flex flex-col min-h-0 border-l bg-gray-800 border-gray-700">
+        <div className="w-full lg:w-96 flex flex-col lg:flex-col min-h-0 lg:border-l bg-gray-800 border-gray-700 border-t lg:border-t-0">
           {/* Input Section */}
-          <div className="flex-1 flex flex-col min-h-0 p-3">
+          <div className="flex-1 flex flex-col min-h-0 p-3" style={{ minHeight: '150px' }}>
             <div className="mb-1">
               <h3 className="text-sm font-medium text-white flex items-center gap-2">
                 <svg className="w-3 h-3 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -473,7 +580,7 @@ function Compiler() {
           </div>
 
           {/* Output Section */}
-          <div className="flex-1 flex flex-col min-h-0 p-3 border-t border-gray-700">
+          <div className="flex-1 flex flex-col min-h-0 p-3 border-t border-gray-700" style={{ minHeight: '150px' }}>
             <div className="mb-1">
               <h3 className="text-sm font-medium text-white flex items-center gap-2">
                 <svg className="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

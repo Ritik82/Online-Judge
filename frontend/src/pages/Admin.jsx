@@ -17,6 +17,7 @@ function Admin() {
     const [showAddProblemModal, setShowAddProblemModal] = useState(false);
     const [showEditProblemModal, setShowEditProblemModal] = useState(false);
     const [editingProblem, setEditingProblem] = useState(null);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -96,6 +97,10 @@ function Admin() {
         navigate('/');
     };
 
+    const toggleMobileMenu = () => {
+        setIsMobileMenuOpen(!isMobileMenuOpen);
+    };
+
     const handleTabChange = (tab) => {
         setActiveTab(tab);
         if (tab === 'users' && users.length === 0) {
@@ -123,17 +128,24 @@ function Admin() {
             {/* Navigation */}
             <nav className="bg-gray-800 border-b border-gray-700">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
-                        <div className="flex items-center space-x-8">
-                            <h1 className="text-xl font-bold text-white">Admin Panel</h1>
-                            <button
-                                onClick={() => navigate('/dashboard')}
-                                className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200"
-                            >
-                                User Dashboard
-                            </button>
+                    <div className="flex justify-between items-center h-[60px] sm:h-[50px]">
+                        {/* Logo and Desktop Navigation */}
+                        <div className="flex items-center">
+                            <h1 className="text-xl font-bold text-white mr-8">Admin Panel</h1>
+                            
+                            {/* Desktop Navigation Links */}
+                            <div className="hidden md:flex items-center space-x-6">
+                                <button
+                                    onClick={() => navigate('/dashboard')}
+                                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200"
+                                >
+                                    User Dashboard
+                                </button>
+                            </div>
                         </div>
-                        <div className="flex items-center space-x-4">
+
+                        {/* Desktop User Menu */}
+                        <div className="hidden md:flex items-center space-x-4">
                             <span className="text-gray-300 text-sm">
                                 Welcome, Admin {localStorage.getItem('loggedInUser')}!
                             </span>
@@ -144,7 +156,57 @@ function Admin() {
                                 Logout
                             </button>
                         </div>
+
+                        {/* Mobile Hamburger Menu Button */}
+                        <div className="md:hidden">
+                            <button
+                                onClick={toggleMobileMenu}
+                                className="text-gray-300 hover:text-white focus:outline-none focus:text-white transition duration-200"
+                            >
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    {isMobileMenuOpen ? (
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    ) : (
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                    )}
+                                </svg>
+                            </button>
+                        </div>
                     </div>
+
+                    {/* Mobile Menu */}
+                    {isMobileMenuOpen && (
+                        <div className="md:hidden border-t border-gray-700 py-4">
+                            <div className="flex flex-col space-y-3">
+                                <button
+                                    onClick={() => {
+                                        navigate('/dashboard');
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition duration-200 text-left"
+                                >
+                                    User Dashboard
+                                </button>
+                                
+                                {/* Mobile User Info */}
+                                <div className="pt-3 border-t border-gray-700">
+                                    <div className="text-gray-300 text-sm px-3 py-2">
+                                        Welcome, Admin {localStorage.getItem('loggedInUser')}!
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            handleLogout();
+                                            setIsMobileMenuOpen(false);
+                                        }}
+                                        className="w-full text-left bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm transition duration-200 mt-2 mx-3"
+                                        style={{ width: 'calc(100% - 1.5rem)' }}
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </nav>
 
